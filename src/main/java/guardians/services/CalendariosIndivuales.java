@@ -77,14 +77,6 @@ public class CalendariosIndivuales {
 		
 		emails = new HashMap<Integer, String> ();
 	}
-	/**Función encargada de componer el objeto calendario*/
-	
-	
-	/**Funcición que crea los eventos para cada guardia y añade a los participantes, ademas llama a la función que gestiona los calendarios indivisuales
-	 * @param dia del evento
-	 * @param tipo tipo de guardia
-	 * @param doctores implicados en dicha guardia*/
-	
 	
 	/**Función que genera los ficheros ics de los calenarios individuales y llama a la función que los envía por correo */
 	public void enviaCalendarios() {
@@ -143,8 +135,6 @@ public class CalendariosIndivuales {
 			emails.put(id, doctor.getEmail());
 			
 		}
-		
-		
 
 		// initialise as an all-day event..
 		LocalDateTime fecha = LocalDateTime.of(anio, mes, numDia, 0, 0);
