@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
@@ -143,21 +144,16 @@ public class CalendariosIndivuales {
 			
 		}
 		
-		java.util.Calendar cal = java.util.Calendar.getInstance();
-		 cal.set(java.util.Calendar.MONTH, mes-1);
-		 cal.set(java.util.Calendar.DAY_OF_MONTH, numDia);
-		 cal.set(java.util.Calendar.YEAR, anio);
 		
 
 		// initialise as an all-day event..
-		Date date = cal.getTime();   
-		LocalDate fecha = date.toInstant().atZone(ZoneId.of("Europe/Madrid")).toLocalDate();
+		LocalDateTime fecha = LocalDateTime.of(anio, mes, numDia, 0, 0);
 		
 		//Generador de ids
 		 RandomUidGenerator ug = new RandomUidGenerator();
 		 
 		//Evento Individual, necesario para que no haya corrupción de datos
-       VEvent event=new VEvent(fecha,fecha,summary);
+       VEvent event=new VEvent(fecha,fecha.plusHours(24),summary);
        event.add(ug.generateUid());
        
 		//Se añade el evento al calendario
