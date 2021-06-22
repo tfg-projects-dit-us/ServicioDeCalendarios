@@ -12,28 +12,20 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
+import com.google.api.client.util.Sleeper;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
-import com.google.api.services.calendar.model.CalendarNotification;
+
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.EventDateTime;
-import com.google.api.services.calendar.model.EventReminder;
-import com.google.api.services.calendar.model.Events;
+
 
 import guardians.model.entities.Doctor;
 import guardians.model.entities.Schedule;
 import guardians.model.entities.ScheduleDay;
-import net.fortuna.ical4j.model.parameter.Cn;
-import net.fortuna.ical4j.model.parameter.CuType;
-import net.fortuna.ical4j.model.parameter.PartStat;
-import net.fortuna.ical4j.model.parameter.Role;
-import net.fortuna.ical4j.model.property.Attendee;
-import net.fortuna.ical4j.model.property.CalScale;
-import net.fortuna.ical4j.model.property.Method;
-import net.fortuna.ical4j.model.property.ProdId;
-import net.fortuna.ical4j.model.property.Version;
+
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -41,13 +33,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -125,7 +118,7 @@ public class calendarioGeneral {
 		colores.put(consultation, "10");
 	}
     
-    public void creaCalendario() throws IOException, GeneralSecurityException {
+    public void creaCalendario() throws IOException, GeneralSecurityException, InterruptedException {
         // Build a new authorized API client service.
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         Calendar calendario = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
@@ -138,7 +131,7 @@ public class calendarioGeneral {
         anio = horario.getYear();
         calIndiv.init(mes, anio);
         
-        String calendarId = "pmuq213v773gss2h5vc67vgqag@group.calendar.google.com";
+        String calendarId = "l2vqpatjob3iuuefoqfspk1c90@group.calendar.google.com";
         SortedSet<ScheduleDay> dias = horario.getDays();
         Iterator<ScheduleDay> iterator = dias.iterator();
         
@@ -152,19 +145,22 @@ public class calendarioGeneral {
 			if (ciclicasDr.size()>0) {
 				Event evento = creaEvento(numDia,cycle,ciclicasDr);
 				calendario.events().insert(calendarId,evento ).setSendUpdates("none").execute();
+				Thread.sleep(20);
 			}
 			
 			
 			if (turnosDr.size()>0) {
 				Event evento=creaEvento( numDia,shifts,turnosDr);
 				calendario.events().insert(calendarId, evento).setSendUpdates("none").execute();
+				Thread.sleep(40);
 			}
 			
 			if (consultasDr.size()>0) {
 				Event evento = creaEvento(numDia,consultation,consultasDr);
 				calendario.events().insert(calendarId, evento ).setSendUpdates("none").execute();
+				Thread.sleep(60);
 			}
-        }
+			       }
         
         calIndiv.enviaCalendarios();
         
@@ -216,7 +212,7 @@ public class calendarioGeneral {
 			    }	
         
       
-        	event.setAttendees(asistentes);
+        //	event.setAttendees(asistentes);
 		return event;
 	}
 

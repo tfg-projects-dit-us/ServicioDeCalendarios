@@ -4,7 +4,7 @@ package guardians.services;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
+import java.security.GeneralSecurityException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -53,6 +53,8 @@ import net.fortuna.ical4j.validate.ValidationException;
 public class CalendariosIndivuales {
 	@Autowired
 	private EmailService emailController;
+	
+
 	private Schedule horario; 
 	@Value("${calendario.tipo.cycle}")
 	private  String cycle;
@@ -108,7 +110,7 @@ public class CalendariosIndivuales {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		} 
 		
 		
 	}
