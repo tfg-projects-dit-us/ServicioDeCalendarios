@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
-import javax.mail.MessagingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -64,8 +63,6 @@ public class calendarioGeneral {
 	private Integer mes;
 	@Autowired
 	private CalendariosIndivuales calIndiv;
-	@Autowired
-	private EmailService emailservice;
 	
 	private HashMap<String, String> ids;
 	private HashMap<String, String> colores;	
@@ -80,7 +77,7 @@ public class calendarioGeneral {
      * If modifying these scopes, delete your previously saved tokens/ folder.
      */
     private static final List<String> SCOPES = Collections.singletonList(CalendarScopes.CALENDAR);
-    private static final String CREDENTIALS_FILE_PATH = "/credenciales.json";
+    private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 	
 
     /**
@@ -119,21 +116,14 @@ public class calendarioGeneral {
 		colores.put(cycle, "5");
 		colores.put(shifts,"7");
 		colores.put(consultation, "10");
-		
-	try {
-		emailservice.enviarEmail("carcohcal@alum.us.es", "calendarioIndividual.ics");
-	} catch (MessagingException | GeneralSecurityException | IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
 	}
     
     public void creaCalendario() throws IOException, GeneralSecurityException, InterruptedException {
         // Build a new authorized API client service.
-      //  final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-       /* Calendar calendario = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+        Calendar calendario = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
                 .setApplicationName(APPLICATION_NAME)
-                .build();  */
+                .build();  
         
         
         mes = horario.getMonth(); 
@@ -141,7 +131,7 @@ public class calendarioGeneral {
         anio = horario.getYear();
         calIndiv.init(mes, anio);
         
-        String calendarId = "9nj51fcleih80p5ii0b4aja7sg@group.calendar.google.com";
+        String calendarId = "l2vqpatjob3iuuefoqfspk1c90@group.calendar.google.com";
         SortedSet<ScheduleDay> dias = horario.getDays();
         Iterator<ScheduleDay> iterator = dias.iterator();
         
@@ -154,20 +144,20 @@ public class calendarioGeneral {
         	
 			if (ciclicasDr.size()>0) {
 				Event evento = creaEvento(numDia,cycle,ciclicasDr);
-			//	calendario.events().insert(calendarId,evento ).setSendUpdates("none").execute();
+				calendario.events().insert(calendarId,evento ).setSendUpdates("none").execute();
 				Thread.sleep(20);
 			}
 			
 			
 			if (turnosDr.size()>0) {
 				Event evento=creaEvento( numDia,shifts,turnosDr);
-			//	calendario.events().insert(calendarId, evento).setSendUpdates("none").execute();
+				calendario.events().insert(calendarId, evento).setSendUpdates("none").execute();
 				Thread.sleep(40);
 			}
 			
 			if (consultasDr.size()>0) {
 				Event evento = creaEvento(numDia,consultation,consultasDr);
-			//	calendario.events().insert(calendarId, evento ).setSendUpdates("none").execute();
+				calendario.events().insert(calendarId, evento ).setSendUpdates("none").execute();
 				Thread.sleep(60);
 			}
 			       }

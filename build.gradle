@@ -29,7 +29,6 @@ repositories {
 dependencies {
 	implementation 'com.google.oauth-client:google-oauth-client-jetty:1.31.4'
     implementation 'com.google.apis:google-api-services-calendar:v3-rev20210429-1.31.0'
-    implementation 'com.google.auth:google-auth-library-oauth2-http:0.26.0'
     
 	implementation 'com.google.apis:google-api-services-gmail:v1-rev20210301-1.31.0'
 	

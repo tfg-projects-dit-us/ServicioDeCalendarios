@@ -2,8 +2,6 @@ package guardians.controllers.assemblers;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.time.YearMonth;
 import java.time.format.DateTimeParseException;
 import java.util.LinkedList;
@@ -78,13 +76,8 @@ public class ScheduleAssembler
 
 		if (status == ScheduleStatus.PENDING_CONFIRMATION) {
 			log.debug("The schedule is in the PENFING_CONFIRMATION status. Adding a link to confirm it");
-			try {
-				links.add(linkTo(methodOn(ScheduleController.class).changeStatus(yearMonth,
-						ScheduleStatus.CONFIRMED.toString().toLowerCase())).withRel(confirmSchedulLink));
-			} catch (GeneralSecurityException | InterruptedException | IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			links.add(linkTo(methodOn(ScheduleController.class).changeStatus(yearMonth,
+					ScheduleStatus.CONFIRMED.toString().toLowerCase())).withRel(confirmSchedulLink));
 		} else {
 			log.debug("The schedule is not in the PENFING_CONFIRMATION status");
 		}
