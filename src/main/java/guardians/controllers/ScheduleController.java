@@ -267,7 +267,7 @@ public class ScheduleController {
 	 *                                        given one
 	 */
 	@PutMapping("/{yearMonth}/{status}")
-	public EntityModel<SchedulePublicDTO> changeStatus(@PathVariable YearMonth yearMonth, @PathVariable String status) {
+	public EntityModel<SchedulePublicDTO> changeStatus(@PathVariable YearMonth yearMonth, @PathVariable String status) throws GeneralSecurityException, InterruptedException, IOException {
 		log.info("Request received: change status of the schedule of " + yearMonth + " to " + status);
 
 		// This can throw a ScheduleNotFoundException
@@ -297,17 +297,6 @@ public class ScheduleController {
 		 * @author Carcohcal
 		 * */
 		calendarService.init(schedule);
-		try {
-			calendarService.creaCalendario();
-		} catch (IOException | GeneralSecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
 		log.info("The persited schedule is: " + savedSchedule);
 
 		return scheduleAssembler.toModel(new SchedulePublicDTO(savedSchedule));

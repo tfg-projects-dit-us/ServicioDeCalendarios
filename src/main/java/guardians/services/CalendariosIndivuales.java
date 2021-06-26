@@ -15,6 +15,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
 
+import javax.mail.MessagingException;
+
 import guardians.model.entities.Doctor;
 import guardians.model.entities.Schedule;
 import guardians.model.entities.ScheduleDay;
@@ -96,7 +98,15 @@ public class CalendariosIndivuales {
 				  outputter.output(calIndividuales.get(i), fout);
 				  
 				  //Se envia por email el calendario individual
-				  emailController.enviarEmail(emails.get(i), nomFich);
+				  try {
+					emailController.enviarEmail(emails.get(i), nomFich);
+				} catch (MessagingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (GeneralSecurityException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				  
 				}
 		
