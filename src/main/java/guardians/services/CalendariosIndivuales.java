@@ -5,19 +5,38 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.HashMap;
-import javax.mail.MessagingException;
+
+import java.util.Iterator;
+import java.util.Set;
+import java.util.SortedSet;
+
 import guardians.model.entities.Doctor;
 import guardians.model.entities.Schedule;
+import guardians.model.entities.ScheduleDay;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.property.Attendee;
 import net.fortuna.ical4j.model.property.CalScale;
+import net.fortuna.ical4j.model.property.Description;
+import net.fortuna.ical4j.model.property.Method;
+import net.fortuna.ical4j.model.property.Organizer;
 import net.fortuna.ical4j.model.property.ProdId;
+import net.fortuna.ical4j.model.parameter.Cn;
+import net.fortuna.ical4j.model.parameter.CuType;
+import net.fortuna.ical4j.model.parameter.PartStat;
+import net.fortuna.ical4j.model.parameter.Role;
+
 import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.util.RandomUidGenerator;
 import net.fortuna.ical4j.validate.ValidationException;
@@ -36,6 +55,7 @@ public class CalendariosIndivuales {
 	private EmailService emailController;
 	
 
+	private Schedule horario; 
 	@Value("${calendario.tipo.cycle}")
 	private  String cycle;
 	@Value("${calendario.tipo.consultation}")
@@ -45,6 +65,8 @@ public class CalendariosIndivuales {
 	
 	private HashMap<Integer, Calendar> calIndividuales;
 	private HashMap<Integer, String> emails;
+	private Calendar calendario;
+
 	private Integer mes;
 	private Integer anio;
 	
@@ -74,12 +96,7 @@ public class CalendariosIndivuales {
 				  outputter.output(calIndividuales.get(i), fout);
 				  
 				  //Se envia por email el calendario individual
-				  try {
-					emailController.enviarEmail(emails.get(i), nomFich);
-				} catch (MessagingException | GeneralSecurityException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				  emailController.enviarEmail(emails.get(i), nomFich);
 				  
 				}
 		
