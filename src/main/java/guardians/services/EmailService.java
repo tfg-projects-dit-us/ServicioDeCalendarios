@@ -7,7 +7,6 @@ import javax.mail.internet.*;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 
 

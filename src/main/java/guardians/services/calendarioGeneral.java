@@ -2,49 +2,38 @@ package guardians.services;
 
 
 
-import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
-import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.DateTime;
-import com.google.api.client.util.Sleeper;
-import com.google.api.client.util.store.FileDataStoreFactory;
-import com.google.api.services.calendar.Calendar;
-import com.google.api.services.calendar.CalendarScopes;
-
-import com.google.api.services.calendar.model.Event;
-import com.google.api.services.calendar.model.EventAttendee;
-import com.google.api.services.calendar.model.EventDateTime;
-
-
-import guardians.model.entities.Doctor;
-import guardians.model.entities.Schedule;
-import guardians.model.entities.ScheduleDay;
 
 
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-
-import java.util.Collections;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
-
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import guardians.model.entities.Doctor;
+import guardians.model.entities.Schedule;
+import guardians.model.entities.ScheduleDay;
+import net.fortuna.ical4j.data.CalendarOutputter;
+import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.parameter.Cn;
+import net.fortuna.ical4j.model.parameter.CuType;
+import net.fortuna.ical4j.model.parameter.Email;
+import net.fortuna.ical4j.model.property.Attendee;
+import net.fortuna.ical4j.model.property.CalScale;
+import net.fortuna.ical4j.model.property.ProdId;
+import net.fortuna.ical4j.model.property.Uid;
+import net.fortuna.ical4j.model.property.Version;
+import net.fortuna.ical4j.validate.ValidationException;
 @Service
 public class calendarioGeneral {
 	
@@ -65,46 +54,8 @@ public class calendarioGeneral {
 	private CalendariosIndivuales calIndiv;
 	
 	private HashMap<String, String> ids;
-	private HashMap<String, String> colores;	
-	
-	
-    private static final String APPLICATION_NAME = "Calendario General Guardias";
-    private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-    private static final String TOKENS_DIRECTORY_PATH = "tokens";
 
-    /**
-     * Global instance of the scopes required by this quickstart.
-     * If modifying these scopes, delete your previously saved tokens/ folder.
-     */
-    private static final List<String> SCOPES = Collections.singletonList(CalendarScopes.CALENDAR);
-    private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
-	
-
-    /**
-     * Creates an authorized Credential object.
-     * @param HTTP_TRANSPORT The network HTTP Transport.
-     * @return An authorized Credential object.
-     * @throws IOException If the credentials.json file cannot be found.
-     */
-    private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
-        // Load client secrets.
-        InputStream in = calendarioGeneral.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
-        if (in == null) {
-            throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
-        }
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
-
-        // Build flow and trigger user authorization request.
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-                HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
-                .setAccessType("offline")
-                .build();
-        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
-        return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
-    }
-
-	
+   
 
     public void init(Schedule schedule){
 		this.horario = schedule;
@@ -112,26 +63,25 @@ public class calendarioGeneral {
 		ids.put(cycle, "jc");
 		ids.put(shifts,"ca");
 		ids.put(consultation, "c");
-		colores = new HashMap<String, String>();
-		colores.put(cycle, "5");
-		colores.put(shifts,"7");
-		colores.put(consultation, "10");
+	
+		
 	}
     
-    public void creaCalendario() throws IOException, GeneralSecurityException, InterruptedException {
-        // Build a new authorized API client service.
-        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        Calendar calendario = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
-                .setApplicationName(APPLICATION_NAME)
-                .build();  
-        
+    public void creaCalendario() throws IOException, GeneralSecurityException, InterruptedException, URISyntaxException {
+    	
+    	
+    	 Calendar calendario = new Calendar();
+		
+		calendario.add(Version.VERSION_2_0);
+		calendario.add(CalScale.GREGORIAN);     
         
         mes = horario.getMonth(); 
     	
         anio = horario.getYear();
+        String prodId = "-//Calendario Guardias"+mes.toString()+anio.toString()+"//iCal4j 1.0//EN";
+		calendario.add(new ProdId(prodId));
         calIndiv.init(mes, anio);
-        
-        String calendarId = "l2vqpatjob3iuuefoqfspk1c90@group.calendar.google.com";
+       
         SortedSet<ScheduleDay> dias = horario.getDays();
         Iterator<ScheduleDay> iterator = dias.iterator();
         
@@ -143,78 +93,86 @@ public class calendarioGeneral {
         	Set<Doctor> turnosDr = dia.getShifts();
         	
 			if (ciclicasDr.size()>0) {
-				Event evento = creaEvento(numDia,cycle,ciclicasDr);
-				calendario.events().insert(calendarId,evento ).setSendUpdates("none").execute();
-				Thread.sleep(20);
+				VEvent evento = creaEvento(numDia,cycle,ciclicasDr);
+				calendario.add(evento); 
 			}
 			
 			
 			if (turnosDr.size()>0) {
-				Event evento=creaEvento( numDia,shifts,turnosDr);
-				calendario.events().insert(calendarId, evento).setSendUpdates("none").execute();
-				Thread.sleep(40);
+				VEvent evento=creaEvento( numDia,shifts,turnosDr);
+				calendario.add(evento);
 			}
 			
 			if (consultasDr.size()>0) {
-				Event evento = creaEvento(numDia,consultation,consultasDr);
-				calendario.events().insert(calendarId, evento ).setSendUpdates("none").execute();
-				Thread.sleep(60);
+				VEvent evento = creaEvento(numDia,consultation,consultasDr);
+				calendario.add(evento);
 			}
-			       }
+			}
         
-        calIndiv.enviaCalendarios();
-        
+       // calIndiv.enviaCalendarios();
+        generaFichero(calendario);
     }
 
 
 
-	private Event creaEvento(Integer numDia, String summary, Set<Doctor> doctores) {
-		Event event = new Event()
-        	    .setSummary(summary);
-        	    
-		String dia = numDia.toString();
-		if (numDia < 10) {
-			dia = "0"+numDia.toString();
-		}
-		
-		String month = mes.toString();
-		if (mes < 10) {
-			month = "0"+mes.toString();
-		}
-        DateTime DateTime = new DateTime(anio.toString()+"-"+month+"-"+dia);
-        
-        
-        EventDateTime Time = new EventDateTime()
-            .setDate(DateTime)
-            .setTimeZone("Europe/Madrid");
-        event.setStart(Time);       
-        event.setEnd(Time);
-        event.setColorId(colores.get(summary));
+	private VEvent creaEvento(Integer numDia, String summary, Set<Doctor> doctores) throws URISyntaxException {
+		 
        
-        String ID = dia+month+anio.toString()+ ids.get(summary);
-        event.setId(ID);
+        String ID = numDia.toString()+mes.toString()+anio.toString()+ ids.get(summary);
+       
         Iterator<Doctor> iterator = doctores.iterator();
-        List<EventAttendee> asistentes = new ArrayList <EventAttendee>();
         
+        // initialise as an all-day event..
+     	LocalDateTime fecha = LocalDateTime.of(anio, mes, numDia, 0, 0);
+     		
+     	//Evento Individual, necesario para que no haya corrupción de datos
+            VEvent event=new VEvent(fecha,fecha.plusHours(24),summary);
+         Uid   uid = new Uid(ID);
+            event.add(uid);
+            
+            
 		while(iterator.hasNext()) {
 				Doctor doctor = iterator.next();
 				calIndiv.addEvent(numDia, summary,doctor);
 				String nombre = doctor.getFirstName()+" "+doctor.getLastNames();
 				String email =doctor.getEmail();
+				Attendee asistente =new Attendee();
+				asistente.add(CuType.INDIVIDUAL);
+				asistente.add(new Cn(nombre));
 				
-			    EventAttendee attendee = new EventAttendee()
-			    		.setEmail(email)
-			    		.setDisplayName(nombre);
-			    asistentes.add(attendee);
-			    
-			    //Llamada al creador de calendario individuales
-			  
+				Email mail = new Email(email);
+				
+				asistente.add(mail);
+				event.add(asistente);
 			    }	
-        
-      
-        //	event.setAttendees(asistentes);
 		return event;
 	}
 
+	
+	private void generaFichero(Calendar calendario) {
+		
+		FileOutputStream fout;
+		
+		try {
+			
+			CalendarOutputter outputter = new CalendarOutputter();	
+			outputter.setValidating(false);
+				  String nomFich = "calendarioGeneral.ics";
+				  fout = new FileOutputStream(nomFich);
+				  outputter.output(calendario, fout);	
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ValidationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		
+		
+	}
 
 }
