@@ -86,6 +86,7 @@ public class LoadInitialData {
 		};
 	}
 
+	@SuppressWarnings("unused")
 	private void preloadCalendarFor(YearMonth yearMonth) {
 		LocalDate day = null;
 		Calendar calendar = new Calendar(yearMonth.getMonthValue(), yearMonth.getYear());

@@ -43,6 +43,7 @@ public class ScheduleAssembler
 	@Value("${api.links.confirmSchedule}")
 	private String confirmSchedulLink;
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public EntityModel<SchedulePublicDTO> toModel(SchedulePublicDTO schedule) {
 		log.info("Request to map to model the SchedulePublicDTO: " + schedule);
@@ -62,6 +63,7 @@ public class ScheduleAssembler
 	public EntityModel<ScheduleSummaryPublicDTO> toModel(ScheduleSummaryPublicDTO schedule) {
 		log.info("Request to map to model the ScheduleSummaryPublicDTO: " + schedule);
 		YearMonth yearMonth =  YearMonth.of(schedule.getYear(), schedule.getMonth());
+		@SuppressWarnings("deprecation")
 		EntityModel<ScheduleSummaryPublicDTO> entity = new EntityModel<>(schedule, 
 				this.getLinks(yearMonth, schedule.getStatus()));
 		log.info("The model created is: " + entity);
@@ -85,6 +87,7 @@ public class ScheduleAssembler
 		return links;
 	}
 
+	@SuppressWarnings("deprecation")
 	public CollectionModel<EntityModel<ScheduleSummaryPublicDTO>> toCollectionModelSummary(
 			Iterable<? extends ScheduleSummaryPublicDTO> entities) {
 		log.info("Request to map to collection model a summary of schedules");

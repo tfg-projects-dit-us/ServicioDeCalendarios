@@ -44,6 +44,7 @@ public class DoctorAssembler implements RepresentationModelAssembler<DoctorPubli
 
 	@Override
 	public EntityModel<DoctorPublicDTO> toModel(DoctorPublicDTO entity) {
+		@SuppressWarnings("deprecation")
 		EntityModel<DoctorPublicDTO> doctorEntity = new EntityModel<>(entity,
 				linkTo(methodOn(DoctorController.class).getDoctor(entity.getId())).withSelfRel(),
 				// TODO add a link to delete the doctor
@@ -57,6 +58,7 @@ public class DoctorAssembler implements RepresentationModelAssembler<DoctorPubli
 		return doctorEntity;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public CollectionModel<EntityModel<DoctorPublicDTO>> toCollectionModel(
 			Iterable<? extends DoctorPublicDTO> entities) {

@@ -41,6 +41,7 @@ public class ShiftConfigurationAssembler
 	@Value("${api.links.allowedshifts}")
 	private String allowedShiftsLink;
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public EntityModel<ShiftConfigurationPublicDTO> toModel(ShiftConfigurationPublicDTO entity) {
 		return new EntityModel<ShiftConfigurationPublicDTO>(entity,
@@ -51,6 +52,7 @@ public class ShiftConfigurationAssembler
 				linkTo(methodOn(AllowedShiftsController.class).getAllowedShifts()).withRel(allowedShiftsLink));
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public CollectionModel<EntityModel<ShiftConfigurationPublicDTO>> toCollectionModel(
 			Iterable<? extends ShiftConfigurationPublicDTO> entities) {

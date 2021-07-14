@@ -39,12 +39,14 @@ public class CalendarAssembler
 	@Value("${api.links.schedule}")
 	private String scheduleLink;
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public EntityModel<CalendarPublicDTO> toModel(CalendarPublicDTO entity) {
 		YearMonth yearMonth = YearMonth.of(entity.getYear(), entity.getMonth());
 		return new EntityModel<CalendarPublicDTO>(entity, this.getLinks(yearMonth));
 	}
 	
+	@SuppressWarnings("deprecation")
 	public EntityModel<CalendarSummaryPublicDTO> toModel(CalendarSummaryPublicDTO entity) {
 		YearMonth yearMonth = YearMonth.of(entity.getYear(), entity.getMonth());
 		return new EntityModel<CalendarSummaryPublicDTO>(entity,this.getLinks(yearMonth));
@@ -58,6 +60,7 @@ public class CalendarAssembler
 		return links;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public CollectionModel<EntityModel<CalendarPublicDTO>> toCollectionModel(
 			Iterable<? extends CalendarPublicDTO> entities) {
@@ -69,6 +72,7 @@ public class CalendarAssembler
 				linkTo(methodOn(RootController.class).getRootLinks()).withRel(rootLink));
 	}
 
+	@SuppressWarnings("deprecation")
 	public CollectionModel<EntityModel<CalendarSummaryPublicDTO>> toCollectionModelSummary(
 			Iterable<? extends CalendarSummaryPublicDTO> entities) {
 		List<EntityModel<CalendarSummaryPublicDTO>> calendars = new LinkedList<>();

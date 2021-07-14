@@ -50,6 +50,7 @@ public class RootController {
 	 * 
 	 * @return A CollectionModel containing only links
 	 */
+	@SuppressWarnings("deprecation")
 	@GetMapping("/")
 	public CollectionModel<Object> getRootLinks() {
 		log.info("Request received: get root");
