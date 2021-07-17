@@ -30,6 +30,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.github.caldav4j.exceptions.CalDAV4JException;
+
 import guardians.controllers.assemblers.ScheduleAssembler;
 import guardians.controllers.exceptions.CalendarNotFoundException;
 import guardians.controllers.exceptions.InvalidScheduleException;
@@ -49,6 +51,7 @@ import guardians.model.repositories.CalendarRepository;
 import guardians.model.repositories.ScheduleRepository;
 import guardians.services.calendarioGeneral;
 import lombok.extern.slf4j.Slf4j;
+import net.fortuna.ical4j.data.ParserException;
 
 // TODO Create integration test for ScheduleController
 
@@ -307,6 +310,12 @@ public class ScheduleController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParserException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CalDAV4JException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

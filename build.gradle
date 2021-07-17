@@ -45,6 +45,8 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test:2.2.6.RELEASE'
     compileOnly 'org.projectlombok:lombok:1.18.20'
 	annotationProcessor 'org.projectlombok:lombok:1.18.20'
+	implementation 'com.github.caldav4j:caldav4j:1.0.1'
+	
     
 }
 group = 'guardians'

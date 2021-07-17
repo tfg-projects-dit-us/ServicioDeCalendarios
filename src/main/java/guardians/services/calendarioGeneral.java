@@ -10,19 +10,39 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
 
+import org.apache.http.Header;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Base64Utils;
+
+import com.github.caldav4j.exceptions.CalDAV4JException;
+import com.github.caldav4j.methods.CalDAV4JMethodFactory;
+import com.github.caldav4j.methods.HttpGetMethod;
 
 import guardians.model.entities.Doctor;
 import guardians.model.entities.Schedule;
 import guardians.model.entities.ScheduleDay;
+import lombok.extern.slf4j.Slf4j;
+import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
+import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.parameter.Cn;
@@ -35,7 +55,9 @@ import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.validate.ValidationException;
 @Service
+@Slf4j
 public class calendarioGeneral {
+	
 	
 	
 	@Value("${calendario.tipo.cycle}")
@@ -46,12 +68,15 @@ public class calendarioGeneral {
 	private  String shifts;
 	
 	private Schedule horario;
-	
+	@Value("${calendario.uri}")
+	private String uri;
 	
 	private Integer anio;
 	private Integer mes;
 	@Autowired
 	private CalendariosIndivuales calIndiv;
+	@Autowired 
+	private CalDav caldav;
 	
 	private HashMap<String, String> ids;
 
@@ -67,19 +92,51 @@ public class calendarioGeneral {
 		
 	}
     
-    public void creaCalendario() throws IOException, GeneralSecurityException, InterruptedException, URISyntaxException {
+    public void creaCalendario() throws IOException, GeneralSecurityException, InterruptedException, URISyntaxException, ParserException, CalDAV4JException {
     	
     	
-    	 Calendar calendario = new Calendar();
-		
-		calendario.add(Version.VERSION_2_0);
-		calendario.add(CalScale.GREGORIAN);     
+
+CalDAV4JMethodFactory factory = new CalDAV4JMethodFactory();
+HttpGetMethod method = factory.createGetMethod(uri);
+
+ 
+
+final String username = "usuario";
+// Customer secret
+final String password = "usuario";
+/*String authString = "Authorization: Basic " +
+        Base64Utils.encodeToString(
+                String.format("%s:%s", username,password)
+                        .getBytes()
+        );
+
+
+method.setHeader("Authorization", authString);*/
+
+CredentialsProvider provider = new BasicCredentialsProvider();
+provider.setCredentials(
+        AuthScope.ANY,
+        new UsernamePasswordCredentials("usuario", "usuario")
+);
+
+HttpClient client = HttpClientBuilder.create()
+.setDefaultCredentialsProvider(provider)
+.disableAuthCaching()
+.build();
+
+
+// Execute the method.
+HttpResponse response = client.execute(method);
+
+// Retrieve the Calendar from the response.
+Calendar calendario = method.getResponseBodyAsCalendar(response);
+ 
         
         mes = horario.getMonth(); 
     	
         anio = horario.getYear();
-        String prodId = "-//Calendario Guardias"+mes.toString()+anio.toString()+"//iCal4j 1.0//EN";
-		calendario.add(new ProdId(prodId));
+       // String prodId = "-//Calendario Guardias"+mes.toString()+anio.toString()+"//iCal4j 1.0//EN";
+		//calendario.add(new ProdId(prodId));
         calIndiv.init(mes, anio);
        
         SortedSet<ScheduleDay> dias = horario.getDays();
@@ -109,7 +166,7 @@ public class calendarioGeneral {
 			}
 			}
         
-       // calIndiv.enviaCalendarios();
+       calIndiv.enviaCalendarios();
         generaFichero(calendario);
     }
 
@@ -160,6 +217,8 @@ public class calendarioGeneral {
 				  String nomFich = "calendarioGeneral.ics";
 				  fout = new FileOutputStream(nomFich);
 				  outputter.output(calendario, fout);	
+				  
+				  caldav.publicarCalendario(calendario);
 			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
