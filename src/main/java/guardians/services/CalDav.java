@@ -8,6 +8,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.AuthenticationException;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpClient;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -56,8 +57,10 @@ provider.setCredentials(
         AuthScope.ANY,
         new UsernamePasswordCredentials("usuario", "usuario")
 );
-CloseableHttpClient client = HttpClientBuilder.create()
+
+HttpClient client = HttpClientBuilder.create()
 .setDefaultCredentialsProvider(provider)
+.disableAuthCaching()
 .build();
 HttpResponse response;
 try {

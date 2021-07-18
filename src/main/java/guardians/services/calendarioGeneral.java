@@ -4,34 +4,34 @@ package guardians.services;
 
 
 
+import java.io.BufferedInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
 
-import org.apache.http.Header;
-import org.apache.http.HttpHeaders;
+import org.apache.http.HttpEntity;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.Credentials;
+
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Base64Utils;
-
 import com.github.caldav4j.exceptions.CalDAV4JException;
 import com.github.caldav4j.methods.CalDAV4JMethodFactory;
 import com.github.caldav4j.methods.HttpGetMethod;
@@ -80,7 +80,7 @@ public class calendarioGeneral {
 	
 	private HashMap<String, String> ids;
 
-   
+	
 
     public void init(Schedule schedule){
 		this.horario = schedule;
@@ -104,14 +104,7 @@ HttpGetMethod method = factory.createGetMethod(uri);
 final String username = "usuario";
 // Customer secret
 final String password = "usuario";
-/*String authString = "Authorization: Basic " +
-        Base64Utils.encodeToString(
-                String.format("%s:%s", username,password)
-                        .getBytes()
-        );
 
-
-method.setHeader("Authorization", authString);*/
 
 CredentialsProvider provider = new BasicCredentialsProvider();
 provider.setCredentials(
@@ -125,11 +118,25 @@ HttpClient client = HttpClientBuilder.create()
 .build();
 
 
+//GetMethod getMethod = new GetMethod(uri);
+
 // Execute the method.
 HttpResponse response = client.execute(method);
 
 // Retrieve the Calendar from the response.
-Calendar calendario = method.getResponseBodyAsCalendar(response);
+
+HttpEntity entity = response.getEntity();
+
+
+// Read the contents of an entity and return it as a String.
+String content = EntityUtils.toString(entity);
+
+
+StringReader stream = new StringReader(content) ;
+
+CalendarBuilder builder = new CalendarBuilder();
+
+Calendar calendario = builder.build(stream);
  
         
         mes = horario.getMonth(); 
