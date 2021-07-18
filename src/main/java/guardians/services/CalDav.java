@@ -18,6 +18,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.github.caldav4j.methods.CalDAV4JMethodFactory;
 import com.github.caldav4j.methods.HttpPostMethod;
 import com.github.caldav4j.methods.HttpPutMethod;
 import com.github.caldav4j.model.request.CalendarRequest;
@@ -35,21 +36,13 @@ public class CalDav {
 
 
 
-CalendarRequest cr = new CalendarRequest();
-cr.setCalendar(calendar);
-cr.setAllEtags(true);
-cr.setCharset(Charset.forName("UTF-8"));
-
-cr.addEtag("\"E2\""); // Quoted
-cr.setIfMatch(true);
-cr.setIfNoneMatch(true);
+CalendarRequest cr = new CalendarRequest(calendar);
 
 
 
-CalendarOutputter outputter = new CalendarOutputter();
-outputter.setValidating(false);
 
-HttpPutMethod method = new HttpPutMethod(uri, cr, outputter);
+CalDAV4JMethodFactory factory = new CalDAV4JMethodFactory();
+HttpPutMethod method = factory.createPutMethod(uri, cr);
 
 
 CredentialsProvider provider = new BasicCredentialsProvider();
@@ -65,9 +58,7 @@ HttpClient client = HttpClientBuilder.create()
 HttpResponse response;
 try {
 	
-	response = client.execute(method);
-	log.info("Respuesta PUT calendario: "+response.getEntity().toString());
-	log.info(response.getStatusLine().toString()); 
+	response = client.execute(method); 
 } catch (IOException e) {
 	// TODO Auto-generated catch block
 	e.printStackTrace();
