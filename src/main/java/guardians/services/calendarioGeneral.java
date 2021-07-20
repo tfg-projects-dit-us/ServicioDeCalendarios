@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
@@ -200,13 +201,9 @@ Calendar calendario = builder.build(stream);
 				calIndiv.addEvent(numDia, summary,doctor);
 				String nombre = doctor.getFirstName()+" "+doctor.getLastNames();
 				String email =doctor.getEmail();
-				Attendee asistente =new Attendee();
+				Attendee asistente =new Attendee(URI.create("mailto:"+email));
 				asistente.add(CuType.INDIVIDUAL);
 				asistente.add(new Cn(nombre));
-				
-				Email mail = new Email(email);
-				
-				asistente.add(mail);
 				event.add(asistente);
 			    }	
 		return event;

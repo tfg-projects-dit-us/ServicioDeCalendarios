@@ -71,7 +71,9 @@ jar {
     attributes(
       'Main-Class': 'guardians.GuardiansApplication'
     )
-  }
+  }from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }
 
 tasks.withType(JavaCompile) {
