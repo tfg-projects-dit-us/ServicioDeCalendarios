@@ -21,6 +21,8 @@ import javax.activation.*;
 public class EmailService
 {
 
+	
+
 	@Value("${email.loggin}")
 	private  String username;
 	@Value("${email.password}")
@@ -88,4 +90,19 @@ public class EmailService
 		e.printStackTrace();
 	}
    }
+	public String getAsunto() {
+		return asunto;
+	}
+
+	public void setAsunto(String asunto) {
+		this.asunto = asunto;
+	}
+
+	public String getMensaje() {
+		return mensaje;
+	}
+
+	public void setMensaje(String mensaje) {
+		this.mensaje = mensaje;
+	}
 }
