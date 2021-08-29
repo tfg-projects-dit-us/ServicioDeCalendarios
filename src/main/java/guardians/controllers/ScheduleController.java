@@ -49,6 +49,7 @@ import guardians.model.entities.ScheduleDay;
 import guardians.model.entities.primarykeys.CalendarPK;
 import guardians.model.repositories.CalendarRepository;
 import guardians.model.repositories.ScheduleRepository;
+import guardians.services.CalDav;
 import guardians.services.calendarioGeneral;
 import lombok.extern.slf4j.Slf4j;
 import net.fortuna.ical4j.data.ParserException;
@@ -68,6 +69,8 @@ public class ScheduleController {
 	
 	@Autowired
 	private calendarioGeneral calendarService;
+	@Autowired
+	private CalDav servidorCalendario;
 	@Autowired
 	private ScheduleRepository scheduleRepository;
 	@Autowired
@@ -325,7 +328,23 @@ public class ScheduleController {
 
 		return scheduleAssembler.toModel(new SchedulePublicDTO(savedSchedule));
 	}
+	
+	/**
+	 * This method handles GET requests of a specific {@link Schedule}
+	 * @author carcohcal
+	 * @param yearMonth The year and month of this schedule. E.g. 2020-06
+	 * @return The found {@link Schedule}
+	 * @throws ScheduleNotFoundException if the {@link Schedule} has not been
+	 *                                   generated yet
+	 */
+	@GetMapping("/individual/{yearMonth}")
+	public net.fortuna.ical4j.model.Calendar getCalendario(@PathVariable YearMonth yearMonth,@RequestBody String email) {
+		log.info("Request received: get schedule of " + yearMonth);
+		net.fortuna.ical4j.model.Calendar schedule = servidorCalendario.recuperarCalendario(yearMonth,email);
+		return schedule;
+	}
 
+	
 	/**
 	 * This method will handle requests to DELETE a specific {@link Schedule}
 	 * 
