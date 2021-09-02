@@ -102,7 +102,7 @@ try {
 	}
 	
 	@SuppressWarnings({ "deprecation", "rawtypes" })
-	public Calendar recuperarCalendario(YearMonth mesAnio, String email) {
+	public void recuperarCalendario(YearMonth mesAnio, String email) {
 
 
 		Calendar calendar = null;
@@ -146,7 +146,7 @@ net.fortuna.ical4j.model.Period period = new net.fortuna.ical4j.model.Period(tod
 Filter filter = new Filter(new PeriodRule(period));
 Collection eventsToday = filter.filter(calendar.getComponents(Component.VEVENT));
 
-
+String nomFich = null;
 try {
 	Attendee a1 = new Attendee(new URI("mailto:"+email));
 	 Predicate<CalendarComponent> attendee1RuleMatch = new HasPropertyRule(a1);
@@ -155,14 +155,14 @@ try {
 	Collection eventosDoctor = filtro.filter(eventsToday);
 	System.out.print(false);
 	
-	FileOutputStream fout;
+	
 	CalendarOutputter outputter = new CalendarOutputter();	
 	outputter.setValidating(false);
 	emailController.init();
-	String nomFich = "calendarioIndividual.ics";
-	  fout = new FileOutputStream(nomFich);
+	 nomFich = "calendario"+mesAnio.toString()+".ics";
+	FileOutputStream fout = new FileOutputStream(nomFich);
 	  
-	  Calendar calendarioDoctor = null;
+	  Calendar calendarioDoctor = new Calendar();
 	Iterator  iterador = eventosDoctor.iterator();
 	while(iterador.hasNext()) {
 		VEvent evento = (VEvent) iterador.next();
@@ -174,6 +174,7 @@ try {
 	  
 	  //Se envia por email el calendario individual
 	  emailController.enviarEmail(email, nomFich);
+	  fout.close();
 } catch (URISyntaxException e) {
 	// TODO Auto-generated catch block
 	e.printStackTrace();
@@ -188,7 +189,7 @@ try {
 	e.printStackTrace();
 }
 
-return calendar;
+
 
 
 
