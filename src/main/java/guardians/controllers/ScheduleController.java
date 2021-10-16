@@ -349,9 +349,9 @@ public class ScheduleController {
 		servidorCalendario.recuperarCalendario(yearMonth,email);
 		
 		String respuesta = "Calendario enviado por correo al doctor.";
-		   
+		log.info("Respuesta enviada");
 			return respuesta;
-
+			
 		
 	}
 

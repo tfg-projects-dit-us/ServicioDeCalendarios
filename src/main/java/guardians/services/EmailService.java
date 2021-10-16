@@ -2,6 +2,8 @@ package guardians.services;
 
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+
 import javax.mail.*;
 import javax.mail.internet.*;
 
@@ -9,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
 
 import javax.activation.*;
 /**
@@ -16,12 +19,10 @@ import javax.activation.*;
  * 
  * @author carcohcal
  */
-
+@Slf4j
 @Service
 public class EmailService
 {
-
-	
 
 	@Value("${email.loggin}")
 	private  String username;
@@ -33,17 +34,20 @@ public class EmailService
 	 private  String asunto;
 	@Value("${email.mensaje}")
 	 private  String mensaje;
-	private final  Properties prop = new Properties();
+	private final  Properties properties = new Properties();
 	private  Session session;
 	
 	/**Método que configura las propiedades del servicio*/
 	public  void init() {
-		prop.put("mail.smtp.auth", true);
-		prop.put("mail.smtp.starttls.enable", "true");
-		prop.put("mail.smtp.host", host);
-		prop.put("mail.smtp.port", "587");
-		prop.put("mail.smtp.ssl.trust", host);		
+		properties.put("mail.transport.protocol", "smtp");
+	    properties.put("mail.smtp.host", host);
+	    properties.put("mail.smtp.port", "587");
+	    properties.put("mail.smtp.auth", "true");
+	    properties.put("mail.smtp.user", username);
+	    properties.put("mail.smtp.password", password);
+	    properties.put("mail.smtp.starttls.enable", "true");	
 		
+		log.info("Configuracion servicio email completad");
 	}
 	
 	/** Método que envía los emails de forma asíncrona 
@@ -51,7 +55,7 @@ public class EmailService
 	 * @param nombre del fichero a enviar como archivo adjunto */
 	@Async
  public void enviarEmail(String emailTo, String nomFich){
-	  session = Session.getInstance(prop, new Authenticator() {
+	  session = Session.getInstance(properties, new Authenticator() {
 		    @Override
 		    protected PasswordAuthentication getPasswordAuthentication() {
 		        return new PasswordAuthentication(username, password);
@@ -81,8 +85,13 @@ public class EmailService
 	    multipart.addBodyPart(messageBodyPart2);  
 
 	    message.setContent(multipart);
-
-	  Transport.send(message);} catch (AddressException e) {
+	    Transport transport = session.getTransport("smtp");
+	    transport.connect();
+		transport.sendMessage(message, message.getAllRecipients());
+	    transport.close();
+	  log.info("Email enviado a: "+emailTo);
+	  } catch (AddressException e)
+	{
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	} catch (MessagingException e) {

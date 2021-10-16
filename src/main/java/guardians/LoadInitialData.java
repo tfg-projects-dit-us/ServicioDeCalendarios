@@ -49,6 +49,7 @@ public class LoadInitialData {
 			preloadDoctor(4, refDate.plusDays(1), 0, 0, 0, true, false);
 			preloadDoctor(5, refDate.plusDays(2), 0, 0, 0, true, false);
 			preloadDoctor(6, refDate.plusDays(2), 3, 5, 0, true, true);
+			preloadDoctor(22, refDate.plusDays(10), 3, 5, 0, false, false);
 			preloadDoctor(7, refDate.plusDays(3), 3, 5, 0, true, false);
 			preloadDoctor(8, refDate.plusDays(3), 0, 0, 0, true, false);
 			preloadDoctor(9, refDate.plusDays(4), 4, 5, 0, true, false);
@@ -64,7 +65,7 @@ public class LoadInitialData {
 			preloadDoctor(19, refDate.plusDays(9), 3, 5, 0, true, false);
 			preloadDoctor(20, refDate.plusDays(9), 4, 5, 2, true, false);
 			preloadDoctor(21, refDate.plusDays(10), 4, 5, 2, false, false);
-			preloadDoctor(22, refDate.plusDays(10), 3, 5, 0, false, false);
+			
 			
 
 			// Preload allowed shifts

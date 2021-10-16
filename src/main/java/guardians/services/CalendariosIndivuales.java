@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import guardians.model.entities.Doctor;
 import guardians.model.entities.Schedule;
+import lombok.extern.slf4j.Slf4j;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.component.VEvent;
@@ -29,7 +31,7 @@ import net.fortuna.ical4j.validate.ValidationException;
  * 
  * @author Carcohcal
  * **/
-
+@Slf4j
 @Service
 public class CalendariosIndivuales {
 	@Autowired
@@ -59,6 +61,7 @@ public class CalendariosIndivuales {
 		calIndividuales = new HashMap<Integer, Calendar>();
 		
 		emails = new HashMap<Integer, String> ();
+		log.info("Iniciado parámetros calendario individuales");
 	}
 	
 	/**Función que genera los ficheros ics de los calenarios individuales y llama a la función que los envía por correo */
@@ -80,7 +83,7 @@ public class CalendariosIndivuales {
 				  emailController.enviarEmail(emails.get(i), nomFich);
 				  
 				}
-		
+		log.info("calendarios individuales mandados a enviar");
 			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -105,6 +108,7 @@ public class CalendariosIndivuales {
 	public void addEvent(Integer numDia, String summary, Doctor doctor) {
 		
 		int id = doctor.getId().intValue();
+		
 		
 		//Si no existe la clave se crea un calendario individual para el doctor
 		if (calIndividuales.containsKey(id)!=true) {

@@ -1,14 +1,8 @@
 package guardians.services;
 
-
-
-
-
-import java.io.BufferedInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -48,19 +42,18 @@ import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.parameter.Cn;
 import net.fortuna.ical4j.model.parameter.CuType;
-import net.fortuna.ical4j.model.parameter.Email;
 import net.fortuna.ical4j.model.property.Attendee;
-import net.fortuna.ical4j.model.property.CalScale;
-import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.Uid;
-import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.validate.ValidationException;
 @Service
 @Slf4j
 public class calendarioGeneral {
 	
+	@Value("${calendario.user}")
+	private String username;
 	
-	
+	@Value("${calendario.psw}")
+	private String password;
 	@Value("${calendario.tipo.cycle}")
 	private  String cycle;
 	@Value("${calendario.tipo.consultation}")
@@ -90,7 +83,7 @@ public class calendarioGeneral {
 		ids.put(shifts,"ca");
 		ids.put(consultation, "c");
 	
-		
+		log.info("Funcion init calendarioGeneral completada");
 	}
     
     public void creaCalendario() throws IOException, GeneralSecurityException, InterruptedException, URISyntaxException, ParserException, CalDAV4JException {
@@ -100,17 +93,12 @@ public class calendarioGeneral {
 CalDAV4JMethodFactory factory = new CalDAV4JMethodFactory();
 HttpGetMethod method = factory.createGetMethod(uri);
 
- 
-
-final String username = "usuario";
-// Customer secret
-final String password = "usuario";
 
 
 CredentialsProvider provider = new BasicCredentialsProvider();
 provider.setCredentials(
         AuthScope.ANY,
-        new UsernamePasswordCredentials("usuario", "usuario")
+        new UsernamePasswordCredentials(username, password)
 );
 
 HttpClient client = HttpClientBuilder.create()
@@ -118,9 +106,7 @@ HttpClient client = HttpClientBuilder.create()
 .disableAuthCaching()
 .build();
 
-
-//GetMethod getMethod = new GetMethod(uri);
-
+log.info("Cliente HTTP creado: "+client);
 // Execute the method.
 HttpResponse response = client.execute(method);
 
@@ -138,13 +124,11 @@ StringReader stream = new StringReader(content) ;
 CalendarBuilder builder = new CalendarBuilder();
 
 Calendar calendario = builder.build(stream);
- 
         
         mes = horario.getMonth(); 
     	
         anio = horario.getYear();
-       // String prodId = "-//Calendario Guardias"+mes.toString()+anio.toString()+"//iCal4j 1.0//EN";
-		//calendario.add(new ProdId(prodId));
+ log.info("Calendario creado para: " +mes+anio);      
         calIndiv.init(mes, anio);
        
         SortedSet<ScheduleDay> dias = horario.getDays();
@@ -221,7 +205,7 @@ Calendar calendario = builder.build(stream);
 				  String nomFich = "calendarioGeneral.ics";
 				  fout = new FileOutputStream(nomFich);
 				  outputter.output(calendario, fout);	
-				  
+				 log.info("Fichero calendarioGeneral creado"); 
 				  caldav.publicarCalendario(calendario);
 			
 		} catch (FileNotFoundException e) {
