@@ -46,7 +46,7 @@ public class EmailService
 	    properties.put("mail.smtp.user", username);
 	    properties.put("mail.smtp.password", password);
 	    properties.put("mail.smtp.starttls.enable", "true");	
-		
+		properties.put("mail.smtp.ssl.trust", host)	;
 		log.info("Configuracion servicio email completad");
 	}
 	
