@@ -1,0 +1,76 @@
+{
+    "description": [
+        "This is the configuration file of the scheduler", 
+        "The descrition of each configuration is self explainatory. ", 
+        "However, there is one thing to take into account: the ",
+        "ABSOLUTE VALUES of the weights are NOT IMPORTANT by ",
+        "themselves. What actually makes the behaviour of the ",
+        "scheduler change is the difference in the RELATIVE VALUES. ",
+        "This is, if wantedShiftWeight=100 and ",
+        "unwantedShiftWeight=100, the scheduler will give the same ",
+        "priority to both of them. However, if wantedShiftWeight=2 ",
+        "and unwantedShiftWeight=1, the scheduler will give twice ",
+        "as much priority to fulfilling a wanted shift request than ",
+        "an unwanted shift one"
+    ],
+    "cycleShiftRate": {
+        "value": 10,
+        "description": [
+            "This value will represent the rate at which doctors have ",
+            "cycle shifts. For example, If the value is 10, doctors ",
+            "will have cycle-shifts every 10 days. A value greater ",
+            "than zero is expected"]
+    },
+    "wantedShiftWeight": {
+        "value": 3,
+        "description": [
+            "This value represents the weight given to allowing a ",
+            "doctor to take one of their wanted shifts. A higher ",
+            "value means a higher priority to assign wanted shifts ",
+            "to the doctors. A value greater than or equal to zero ",
+            "is expected."
+        ]
+    }, 
+    "unwantedShiftWeight": {
+        "value": 3,
+        "description": [
+            "This value represents the weight given to allowing a ",
+            "doctor to not take one of their unwanted shifts. A ",
+            "higher value means a higher priority to not assign ",
+            "unwanted shifts to the doctors. A value greater than or ",
+            "equal to zero is expected."
+        ]
+    },
+    "wantedConsultationWeight": {
+        "value": 3,
+        "description": [
+            "This value represents the weight given to allowing a ",
+            "doctor to take one of their wanted consultations. A ",
+            "higher value means a higher priority to assign wanted ",
+            "consultations to the doctors. A value greater than or ",
+            "equal to zero is expected."
+        ]
+    },
+    "allShiftWeight": {
+        "value": 1,
+        "description": [
+            "This value represents the weight given to each shift ",
+            "that is scheduled. The contribution of shifts to the ",
+            "objective function will be negative, meaning that a ",
+            "higher value of this field will make the scheduler try ",
+            "to assign as few shifts as posible. A value greater than ",
+            "zero is expected"
+        ]
+    },
+    "consultationWeight": {
+        "value": 1,
+        "description": [
+            "This value represents the weight given to each ",
+            "consultation that is scheduled. The contribution of ",
+            "consultations to the objective function will be ",
+            "postive, meaning that a higher value of this field will ",
+            "make the scheduler try to assign as much consultations ",
+            "as posible. A value greater than zero is expected"
+        ]
+    }
+}

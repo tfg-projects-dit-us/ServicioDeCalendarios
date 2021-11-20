@@ -1,0 +1,39 @@
+{
+    "version": 1,
+    "formatters": {
+        "brief": {
+            "format": "[%(levelname)s] %(name)s - %(message)s"
+        },
+        "precise": {
+            "format": "%(asctime)s [%(levelname)s] %(name)s - %(message)s"
+        }
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "brief"
+        },
+        "file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "formatter": "precise",
+            "filename": "PATH_TO_LOG_FILE",
+            "maxBytes": 1048576,
+            "backupCount": 3
+        }
+    },
+    "loggers": {
+        "main": {
+            "level": "INFO",
+            "handlers": ["console", "file"]
+        },
+        "scheduler.schedule": {
+            "level": "INFO",
+            "handlers": ["console", "file"]
+        },
+        "scheduler.getShiftPreferences": {
+            "level": "WARN",
+            "handlers": ["console", "file"]
+        }
+    },
+    "disable_existing_loggers ": false
+}

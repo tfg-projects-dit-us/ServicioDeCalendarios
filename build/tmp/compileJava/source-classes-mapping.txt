@@ -1,7 +1,7 @@
-guardians/model/entities/primarykeys/package-info.java
- guardians.model.entities.primarykeys.package-info
 guardians/model/validation/annotations/ValidCalendar.java
  guardians.model.validation.annotations.ValidCalendar
+guardians/model/entities/primarykeys/package-info.java
+ guardians.model.entities.primarykeys.package-info
 guardians/model/validation/validators/DayMonthYearCycleChangeValidator.java
  guardians.model.validation.validators.DayMonthYearCycleChangeValidator
 guardians/model/dtos/scheduler/CalendarSchedulerDTO.java
@@ -14,22 +14,22 @@ guardians/model/entities/DayConfiguration.java
  guardians.model.entities.DayConfiguration
 guardians/controllers/package-info.java
  guardians.controllers.package-info
-guardians/controllers/exceptions/package-info.java
- guardians.controllers.exceptions.package-info
 guardians/model/dtos/scheduler/CycleChangeSchedulerDTO.java
  guardians.model.dtos.scheduler.CycleChangeSchedulerDTO
+guardians/controllers/exceptions/package-info.java
+ guardians.controllers.exceptions.package-info
 guardians/model/validation/validators/ShiftPreferencesDayConfigValidator.java
  guardians.model.validation.validators.ShiftPreferencesDayConfigValidator
 guardians/model/validation/validators/DayMonthYearScheduleDayValidator.java
  guardians.model.validation.validators.DayMonthYearScheduleDayValidator
-guardians/model/validation/annotations/ValidShiftPreferences.java
- guardians.model.validation.annotations.ValidShiftPreferences
 guardians/model/dtos/scheduler/DayConfigurationSchedulerDTO.java
  guardians.model.dtos.scheduler.DayConfigurationSchedulerDTO
-guardians/model/dtos/scheduler/ShiftConfigurationSchedulerDTO.java
- guardians.model.dtos.scheduler.ShiftConfigurationSchedulerDTO
+guardians/model/validation/annotations/ValidShiftPreferences.java
+ guardians.model.validation.annotations.ValidShiftPreferences
 guardians/controllers/MyAdviceController.java
  guardians.controllers.MyAdviceController
+guardians/model/dtos/scheduler/ShiftConfigurationSchedulerDTO.java
+ guardians.model.dtos.scheduler.ShiftConfigurationSchedulerDTO
 guardians/model/dtos/general/CalendarSummaryPublicDTO.java
  guardians.model.dtos.general.CalendarSummaryPublicDTO
 guardians/model/dtos/general/ShiftConfigurationPublicDTO.java
@@ -38,10 +38,10 @@ guardians/controllers/ShiftConfigurationController.java
  guardians.controllers.ShiftConfigurationController
 guardians/model/entities/primarykeys/DayMonthYearPK.java
  guardians.model.entities.primarykeys.DayMonthYearPK
-guardians/model/dtos/general/DayConfigurationPublicDTO.java
- guardians.model.dtos.general.DayConfigurationPublicDTO
 guardians/controllers/exceptions/InvalidScheduleStatusTransitionException.java
  guardians.controllers.exceptions.InvalidScheduleStatusTransitionException
+guardians/model/dtos/general/DayConfigurationPublicDTO.java
+ guardians.model.dtos.general.DayConfigurationPublicDTO
 guardians/model/validation/annotations/ValidShiftConfiguration.java
  guardians.model.validation.annotations.ValidShiftConfiguration
 guardians/controllers/exceptions/InvalidScheduleException.java
@@ -50,22 +50,22 @@ guardians/model/repositories/CalendarRepository.java
  guardians.model.repositories.CalendarRepository
 guardians/controllers/exceptions/InvalidDayConfigurationException.java
  guardians.controllers.exceptions.InvalidDayConfigurationException
-guardians/model/repositories/ScheduleDayRepository.java
- guardians.model.repositories.ScheduleDayRepository
 guardians/model/repositories/AbsenceRepository.java
  guardians.model.repositories.AbsenceRepository
+guardians/model/repositories/ScheduleDayRepository.java
+ guardians.model.repositories.ScheduleDayRepository
 guardians/model/validation/validators/ShiftPreferencesShiftConfigValidator.java
  guardians.model.validation.validators.ShiftPreferencesShiftConfigValidator
-guardians/model/validation/annotations/ValidAbsenceDates.java
- guardians.model.validation.annotations.ValidAbsenceDates
 guardians/controllers/exceptions/CalendarAlreadyExistsException.java
  guardians.controllers.exceptions.CalendarAlreadyExistsException
+guardians/model/validation/annotations/ValidAbsenceDates.java
+ guardians.model.validation.annotations.ValidAbsenceDates
 guardians/model/repositories/DoctorRepository.java
  guardians.model.repositories.DoctorRepository
-guardians/model/dtos/general/CalendarPublicDTO.java
- guardians.model.dtos.general.CalendarPublicDTO
 guardians/controllers/exceptions/InvalidEntityException.java
  guardians.controllers.exceptions.InvalidEntityException
+guardians/model/dtos/general/CalendarPublicDTO.java
+ guardians.model.dtos.general.CalendarPublicDTO
 guardians/model/dtos/general/package-info.java
  guardians.model.dtos.general.package-info
 guardians/model/entities/Schedule.java
@@ -83,10 +83,10 @@ guardians/GuardiansApplication.java
  guardians.GuardiansApplication
 guardians/model/dtos/general/ScheduleSummaryPublicDTO.java
  guardians.model.dtos.general.ScheduleSummaryPublicDTO
-guardians/model/dtos/general/CycleChangePublicDTO.java
- guardians.model.dtos.general.CycleChangePublicDTO
 guardians/controllers/exceptions/InvalidScheduleStatusException.java
  guardians.controllers.exceptions.InvalidScheduleStatusException
+guardians/model/dtos/general/CycleChangePublicDTO.java
+ guardians.model.dtos.general.CycleChangePublicDTO
 guardians/model/dtos/general/AbsencePublicDTO.java
  guardians.model.dtos.general.AbsencePublicDTO
 guardians/controllers/assemblers/AllowedShiftAssembler.java
@@ -95,6 +95,8 @@ guardians/model/validation/validators/CycleChangeValidator.java
  guardians.model.validation.validators.CycleChangeValidator
 guardians/model/validation/validators/DayMonthYearDayConfigurationValidator.java
  guardians.model.validation.validators.DayMonthYearDayConfigurationValidator
+guardians/services/CalDav.java
+ guardians.services.CalDav
 guardians/model/entities/Absence.java
  guardians.model.entities.Absence
 guardians/LoadInitialData.java
@@ -113,14 +115,14 @@ guardians/controllers/CalendarController.java
  guardians.controllers.CalendarController
 guardians/controllers/SchedulerHandler.java
  guardians.controllers.SchedulerHandler
-guardians/WebSecurityConfig.java
- guardians.WebSecurityConfig
 guardians/controllers/assemblers/DoctorAssembler.java
  guardians.controllers.assemblers.DoctorAssembler
-guardians/model/entities/Calendar.java
- guardians.model.entities.Calendar
+guardians/WebSecurityConfig.java
+ guardians.WebSecurityConfig
 guardians/model/entities/AbstractDay.java
  guardians.model.entities.AbstractDay
+guardians/model/entities/Calendar.java
+ guardians.model.entities.Calendar
 guardians/model/dtos/package-info.java
  guardians.model.dtos.package-info
 guardians/model/entities/package-info.java
@@ -131,45 +133,45 @@ guardians/services/calendarioGeneral.java
  guardians.services.calendarioGeneral
 guardians/model/entities/AllowedShift.java
  guardians.model.entities.AllowedShift
-guardians/model/dtos/scheduler/AllowedShiftSchedulerDTO.java
- guardians.model.dtos.scheduler.AllowedShiftSchedulerDTO
 guardians/controllers/AllowedShiftsController.java
  guardians.controllers.AllowedShiftsController
+guardians/model/dtos/scheduler/AllowedShiftSchedulerDTO.java
+ guardians.model.dtos.scheduler.AllowedShiftSchedulerDTO
 guardians/model/validation/validators/package-info.java
  guardians.model.validation.validators.package-info
 guardians/controllers/exceptions/NotFoundException.java
  guardians.controllers.exceptions.NotFoundException
 guardians/model/dtos/general/DoctorPublicDTO.java
  guardians.model.dtos.general.DoctorPublicDTO
-guardians/services/CalendariosIndivuales.java
- guardians.services.CalendariosIndivuales
 guardians/services/EmailService.java
  guardians.services.EmailService
  guardians.services.EmailService$1
-guardians/model/validation/validators/ShiftPreferencesValidator.java
- guardians.model.validation.validators.ShiftPreferencesValidator
+guardians/services/CalendariosIndivuales.java
+ guardians.services.CalendariosIndivuales
 guardians/model/validation/validators/CalendarValidator.java
  guardians.model.validation.validators.CalendarValidator
+guardians/model/validation/validators/ShiftPreferencesValidator.java
+ guardians.model.validation.validators.ShiftPreferencesValidator
 guardians/model/repositories/AllowedShiftRepository.java
  guardians.model.repositories.AllowedShiftRepository
 guardians/model/validation/validators/DayMonthYearValidator.java
  guardians.model.validation.validators.DayMonthYearValidator
 guardians/model/validation/validators/ShiftConfigurationValidator.java
  guardians.model.validation.validators.ShiftConfigurationValidator
-guardians/model/repositories/package-info.java
- guardians.model.repositories.package-info
 guardians/controllers/exceptions/ShiftConfigurationNotFoundException.java
  guardians.controllers.exceptions.ShiftConfigurationNotFoundException
+guardians/model/repositories/package-info.java
+ guardians.model.repositories.package-info
 guardians/model/dtos/scheduler/ScheduleDaySchedulerDTO.java
  guardians.model.dtos.scheduler.ScheduleDaySchedulerDTO
 guardians/model/dtos/scheduler/DoctorSchedulerDTO.java
  guardians.model.dtos.scheduler.DoctorSchedulerDTO
-guardians/model/validation/annotations/ValidSchedule.java
- guardians.model.validation.annotations.ValidSchedule
-guardians/model/entities/ShiftConfiguration.java
- guardians.model.entities.ShiftConfiguration
 guardians/controllers/assemblers/ScheduleAssembler.java
  guardians.controllers.assemblers.ScheduleAssembler
+guardians/model/entities/ShiftConfiguration.java
+ guardians.model.entities.ShiftConfiguration
+guardians/model/validation/annotations/ValidSchedule.java
+ guardians.model.validation.annotations.ValidSchedule
 guardians/controllers/exceptions/ScheduleAlreadyExistsException.java
  guardians.controllers.exceptions.ScheduleAlreadyExistsException
 guardians/controllers/exceptions/InvalidDoctorException.java
@@ -201,14 +203,14 @@ guardians/model/dtos/scheduler/package-info.java
  guardians.model.dtos.scheduler.package-info
 guardians/controllers/assemblers/ShiftConfigurationAssembler.java
  guardians.controllers.assemblers.ShiftConfigurationAssembler
-guardians/controllers/exceptions/InvalidAbsenceException.java
- guardians.controllers.exceptions.InvalidAbsenceException
 guardians/controllers/exceptions/CalendarNotFoundException.java
  guardians.controllers.exceptions.CalendarNotFoundException
-guardians/model/validation/annotations/package-info.java
- guardians.model.validation.annotations.package-info
+guardians/controllers/exceptions/InvalidAbsenceException.java
+ guardians.controllers.exceptions.InvalidAbsenceException
 guardians/controllers/ScheduleController.java
  guardians.controllers.ScheduleController
+guardians/model/validation/annotations/package-info.java
+ guardians.model.validation.annotations.package-info
 guardians/model/dtos/general/SchedulePublicDTO.java
  guardians.model.dtos.general.SchedulePublicDTO
 guardians/controllers/assemblers/CalendarAssembler.java
@@ -217,17 +219,17 @@ guardians/model/entities/ScheduleDay.java
  guardians.model.entities.ScheduleDay
 guardians/controllers/exceptions/ScheduleNotFoundException.java
  guardians.controllers.exceptions.ScheduleNotFoundException
-guardians/controllers/assemblers/package-info.java
- guardians.controllers.assemblers.package-info
-guardians/controllers/exceptions/DoctorNotFoundException.java
- guardians.controllers.exceptions.DoctorNotFoundException
 guardians/controllers/exceptions/AlreadyExistsException.java
  guardians.controllers.exceptions.AlreadyExistsException
-guardians/controllers/DoctorController.java
- guardians.controllers.DoctorController
+guardians/controllers/exceptions/DoctorNotFoundException.java
+ guardians.controllers.exceptions.DoctorNotFoundException
+guardians/controllers/assemblers/package-info.java
+ guardians.controllers.assemblers.package-info
 guardians/controllers/exceptions/DoctorDeletedException.java
  guardians.controllers.exceptions.DoctorDeletedException
-guardians/model/validation/annotations/ValidDayMonthYear.java
- guardians.model.validation.annotations.ValidDayMonthYear
+guardians/controllers/DoctorController.java
+ guardians.controllers.DoctorController
 guardians/model/entities/primarykeys/CalendarPK.java
  guardians.model.entities.primarykeys.CalendarPK
+guardians/model/validation/annotations/ValidDayMonthYear.java
+ guardians.model.validation.annotations.ValidDayMonthYear
