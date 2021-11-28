@@ -19,6 +19,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.BasicCredentialsProvider;
@@ -86,55 +87,21 @@ public class calendarioGeneral {
 		log.info("Funcion init calendarioGeneral completada");
 	}
     
-    public void creaCalendario() throws IOException, GeneralSecurityException, InterruptedException, URISyntaxException, ParserException, CalDAV4JException {
+public void creaCalendario() throws IOException, GeneralSecurityException, InterruptedException, URISyntaxException, ParserException, CalDAV4JException {
     	
     	
-
-CalDAV4JMethodFactory factory = new CalDAV4JMethodFactory();
-HttpGetMethod method = factory.createGetMethod(uri);
-
-
-
-CredentialsProvider provider = new BasicCredentialsProvider();
-provider.setCredentials(
-        AuthScope.ANY,
-        new UsernamePasswordCredentials(username, password)
-);
-
-HttpClient client = HttpClientBuilder.create()
-.setDefaultCredentialsProvider(provider)
-.disableAuthCaching()
-.build();
-
-log.info("Cliente HTTP creado: "+client);
-// Execute the method.
-HttpResponse response = client.execute(method);
-
-// Retrieve the Calendar from the response.
-
-HttpEntity entity = response.getEntity();
-
-
-// Read the contents of an entity and return it as a String.
-String content = EntityUtils.toString(entity);
-
-
-StringReader stream = new StringReader(content) ;
-
-CalendarBuilder builder = new CalendarBuilder();
-
-Calendar calendario = builder.build(stream);
-        
-        mes = horario.getMonth(); 
-    	
-        anio = horario.getYear();
- log.info("Calendario creado para: " +mes+anio);      
-        calIndiv.init(mes, anio);
+	Calendar calendario = getCalendario();
+	        
+    mes = horario.getMonth(); 
+    anio = horario.getYear();
+    log.info("Calendario creado para: " +mes+anio);      
+    
+    calIndiv.init(mes, anio);
        
-        SortedSet<ScheduleDay> dias = horario.getDays();
-        Iterator<ScheduleDay> iterator = dias.iterator();
+    SortedSet<ScheduleDay> dias = horario.getDays();
+    Iterator<ScheduleDay> iterator = dias.iterator();
         
-        while (iterator.hasNext()) {
+    while (iterator.hasNext()) {
         	ScheduleDay dia = iterator.next();
         	Integer numDia = dia.getDay();
         	Set<Doctor> ciclicasDr = dia.getCycle();
@@ -143,23 +110,19 @@ Calendar calendario = builder.build(stream);
         	
 			if (ciclicasDr.size()>0) {
 				VEvent evento = creaEvento(numDia,cycle,ciclicasDr);
-				calendario.add(evento); 
-			}
-			
+				calendario.add(evento); }
 			
 			if (turnosDr.size()>0) {
 				VEvent evento=creaEvento( numDia,shifts,turnosDr);
-				calendario.add(evento);
-			}
+				calendario.add(evento);		}
 			
 			if (consultasDr.size()>0) {
 				VEvent evento = creaEvento(numDia,consultation,consultasDr);
-				calendario.add(evento);
-			}
+				calendario.add(evento);	}
 			}
         
        calIndiv.enviaCalendarios();
-        generaFichero(calendario);
+       generaFichero(calendario);
     }
 
 
@@ -222,4 +185,50 @@ Calendar calendario = builder.build(stream);
 		
 	}
 
+	public void actualizarCalendario(Schedule horarioModificado) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	private Calendar getCalendario() throws ClientProtocolException, IOException, ParserException
+	{
+
+		CalDAV4JMethodFactory factory = new CalDAV4JMethodFactory();
+		HttpGetMethod method = factory.createGetMethod(uri);
+		
+		
+		
+		CredentialsProvider provider = new BasicCredentialsProvider();
+		provider.setCredentials(
+		        AuthScope.ANY,
+		        new UsernamePasswordCredentials(username, password)
+		);
+		
+		HttpClient client = HttpClientBuilder.create()
+		.setDefaultCredentialsProvider(provider)
+		.disableAuthCaching()
+		.build();
+
+		log.info("Cliente HTTP creado: "+client);
+		
+		// Execute the method.
+		HttpResponse response = client.execute(method);
+		
+		// Retrieve the Calendar from the response.
+		
+		HttpEntity entity = response.getEntity();
+		
+		
+		// Read the contents of an entity and return it as a String.
+		String content = EntityUtils.toString(entity);
+		
+		
+		StringReader stream = new StringReader(content) ;
+		
+		CalendarBuilder builder = new CalendarBuilder();
+		
+		Calendar calendario = builder.build(stream);
+		return calendario;
+		        
+	}
 }

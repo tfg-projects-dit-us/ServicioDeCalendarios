@@ -255,6 +255,12 @@ public class ScheduleController {
 			log.info("Attempting to persist the schedule");
 			savedSchedule = scheduleRepository.save(schedule);
 			log.info("The persisted schedule is: " + savedSchedule);
+			
+			//carcohcal
+			
+			log.info("Intento de actualizar calendario en el servidor");
+			
+			calendarService.actualizarCalendario(schedule);
 		}
 
 		return scheduleAssembler.toModel(new SchedulePublicDTO(savedSchedule));
