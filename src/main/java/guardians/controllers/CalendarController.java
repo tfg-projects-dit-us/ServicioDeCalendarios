@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import guardians.controllers.assemblers.CalendarAssembler;
@@ -25,12 +26,15 @@ import guardians.controllers.exceptions.CalendarAlreadyExistsException;
 import guardians.controllers.exceptions.CalendarNotFoundException;
 import guardians.controllers.exceptions.InvalidCalendarException;
 import guardians.controllers.exceptions.InvalidDayConfigurationException;
+import guardians.controllers.exceptions.ScheduleNotFoundException;
 import guardians.model.dtos.general.CalendarPublicDTO;
 import guardians.model.dtos.general.CalendarSummaryPublicDTO;
 import guardians.model.entities.Calendar;
 import guardians.model.entities.DayConfiguration;
+import guardians.model.entities.Schedule;
 import guardians.model.entities.primarykeys.CalendarPK;
 import guardians.model.repositories.CalendarRepository;
+import guardians.services.CalDav;
 import lombok.extern.slf4j.Slf4j;
 
 // TODO Create integration test for CalendarController
@@ -49,7 +53,8 @@ public class CalendarController {
 
 	@Autowired
 	private CalendarAssembler calendarAssembler;
-
+	@Autowired
+	private CalDav servidorCalendario;
 	@Autowired
 	private Validator validator;
 
@@ -182,5 +187,26 @@ public class CalendarController {
 
 		Calendar savedCalendar = calendarRepository.save(calendar);
 		return calendarAssembler.toModel(new CalendarPublicDTO(savedCalendar));
+	}
+	
+	
+	/**
+	 * This method handles GET requests of a specific {@link Schedule}
+	 * @author carcohcal
+	 * @param yearMonth The year and month of this schedule. E.g. 2020-06
+	 * @return The found {@link Schedule}
+	 * @throws ScheduleNotFoundException if the {@link Schedule} has not been
+	 *                                   generated yet
+	 */
+	@ResponseBody
+	@GetMapping("/individual/{yearMonth}")
+	public String getCalendario(@PathVariable YearMonth yearMonth,@RequestBody String email) {
+		log.info("Request received: get schedule of " + yearMonth);
+		
+		servidorCalendario.recuperarCalendario(yearMonth,email);
+		
+		String respuesta = "Calendario enviado por correo al doctor.";
+		log.info("Respuesta enviada");
+			return respuesta;
 	}
 }

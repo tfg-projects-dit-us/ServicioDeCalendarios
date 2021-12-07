@@ -17,6 +17,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 
+import org.apache.http.client.ClientProtocolException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.hateoas.CollectionModel;
@@ -74,8 +75,7 @@ public class ScheduleController {
 	
 	@Autowired
 	private calendarioGeneral calendarService;
-	@Autowired
-	private CalDav servidorCalendario;
+	
 	@Autowired
 	private ScheduleRepository scheduleRepository;
 	@Autowired
@@ -204,6 +204,10 @@ public class ScheduleController {
 	 *                    be updated
 	 * @param scheduleDTO The new value to use for the {@link Schedule}
 	 * @return The persisted {@link Schedule}
+	 * @throws ParserException 
+	 * @throws IOException 
+	 * @throws ClientProtocolException 
+	 * @throws URISyntaxException 
 	 * @throws ScheduleNotFoundException
 	 * @throws ConstraintViolationException if any of the {@link ScheduleDay}s is
 	 *                                      not valid
@@ -211,7 +215,7 @@ public class ScheduleController {
 	 */
 	@PutMapping("/{yearMonth}")
 	public EntityModel<SchedulePublicDTO> updateSchedule(@PathVariable YearMonth yearMonth,
-			@RequestBody SchedulePublicDTO scheduleDTO) {
+			@RequestBody SchedulePublicDTO scheduleDTO) throws ClientProtocolException, IOException, ParserException, URISyntaxException {
 		log.info("Request received: update the schedule of " + yearMonth + " with " + scheduleDTO);
 
 		Schedule schedule = scheduleDTO.toSchedule();
@@ -256,7 +260,7 @@ public class ScheduleController {
 			savedSchedule = scheduleRepository.save(schedule);
 			log.info("The persisted schedule is: " + savedSchedule);
 			
-			//carcohcal
+			/**@author carcohcal**/
 			
 			log.info("Intento de actualizar calendario en el servidor");
 			
@@ -340,28 +344,7 @@ public class ScheduleController {
 		return scheduleAssembler.toModel(new SchedulePublicDTO(savedSchedule));
 	}
 	
-	/**
-	 * This method handles GET requests of a specific {@link Schedule}
-	 * @author carcohcal
-	 * @param yearMonth The year and month of this schedule. E.g. 2020-06
-	 * @return The found {@link Schedule}
-	 * @throws ScheduleNotFoundException if the {@link Schedule} has not been
-	 *                                   generated yet
-	 */
-	@ResponseBody
-	@GetMapping("/individual/{yearMonth}")
-	public String getCalendario(@PathVariable YearMonth yearMonth,@RequestBody String email) {
-		log.info("Request received: get schedule of " + yearMonth);
-		servidorCalendario.recuperarCalendario(yearMonth,email);
 		
-		String respuesta = "Calendario enviado por correo al doctor.";
-		log.info("Respuesta enviada");
-			return respuesta;
-			
-		
-	}
-
-	
 	/**
 	 * This method will handle requests to DELETE a specific {@link Schedule}
 	 * 
