@@ -11,6 +11,7 @@ import java.time.YearMonth;
 import java.time.temporal.TemporalAmount;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.Predicate;
 
 import org.apache.http.HttpResponse;
@@ -38,9 +39,11 @@ import net.fortuna.ical4j.filter.HasPropertyRule;
 import net.fortuna.ical4j.filter.PeriodRule;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.component.CalendarComponent;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.Attendee;
+import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.validate.ValidationException;
 /**
  * Esta clase se encarga de interactuar con el servidor CalDAV 
@@ -184,4 +187,50 @@ public void recuperarCalendario(YearMonth mesAnio, String email) {
 
 
 	}
+
+public void getEvento() {
+	// TODO Auto-generated method stub
+	Calendar calendar = null;
+	CalDAV4JMethodFactory factory = new CalDAV4JMethodFactory();
+	HttpGetMethod method = factory.createGetMethod(uri);
+	CredentialsProvider provider = new BasicCredentialsProvider();
+	provider.setCredentials(
+	        AuthScope.ANY,
+	        new UsernamePasswordCredentials("usuario", "usuario")
+	);
+
+	HttpClient client = HttpClientBuilder.create()
+	.setDefaultCredentialsProvider(provider)
+	.disableAuthCaching()
+	.build();
+	log.info("Cliente HTTP GET "+client);
+	// Execute the method.
+	HttpResponse response;
+	try {
+		response = client.execute(method);
+		log.info("Respuesta peticion GET: "+response);
+		// Retrieve the Calendar from the response.
+		calendar = method.getResponseBodyAsCalendar(response);
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	} catch (ParserException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	} catch (CalDAV4JException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+		
+	Uid   uid = new Uid("1122021jc");
+    
+	Predicate<CalendarComponent> eventRuleMatch = new HasPropertyRule(uid);
+	Filter filtro = new Filter<CalendarComponent>(new Predicate[] { eventRuleMatch}, Filter.MATCH_ALL);
+	
+	Collection evento = filtro.filter(calendar.getComponents(Component.VEVENT));
+	
+	System.out.println(evento);
+	
+}
 }

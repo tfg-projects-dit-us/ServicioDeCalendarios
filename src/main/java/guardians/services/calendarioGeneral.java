@@ -85,7 +85,8 @@ public class calendarioGeneral {
 		ids.put(consultation, "c");
 	
 		log.info("Funcion init calendarioGeneral completada");
-	}
+		
+		}
     
 public void creaCalendario() throws IOException, GeneralSecurityException, InterruptedException, URISyntaxException, ParserException, CalDAV4JException {
     	
@@ -185,8 +186,41 @@ public void creaCalendario() throws IOException, GeneralSecurityException, Inter
 		
 	}
 
-	public void actualizarCalendario(Schedule horarioModificado) {
-		// TODO Auto-generated method stub
+	public void actualizarCalendario(Schedule horarioModificado) throws ClientProtocolException, IOException, ParserException, URISyntaxException {
+		Calendar calendarOriginal = getCalendario();
+		
+		Calendar calendarioModif = null;
+		
+		 
+		
+		mes = horario.getMonth(); 
+	    anio = horario.getYear();
+	    log.info("Calendario creado para: " +mes+anio);      
+	    
+	    calIndiv.init(mes, anio);
+	       
+	    SortedSet<ScheduleDay> dias = horarioModificado.getDays();
+	    Iterator<ScheduleDay> iterator = dias.iterator();
+	        
+	    while (iterator.hasNext()) {
+	        	ScheduleDay dia = iterator.next();
+	        	Integer numDia = dia.getDay();
+	        	Set<Doctor> ciclicasDr = dia.getCycle();
+	        	Set<Doctor> consultasDr = dia.getConsultations();
+	        	Set<Doctor> turnosDr = dia.getShifts();
+	        	
+				if (ciclicasDr.size()>0) {
+					VEvent evento = creaEvento(numDia,cycle,ciclicasDr);
+					calendarioModif.add(evento); }
+				
+				if (turnosDr.size()>0) {
+					VEvent evento=creaEvento( numDia,shifts,turnosDr);
+					calendarioModif.add(evento);		}
+				
+				if (consultasDr.size()>0) {
+					VEvent evento = creaEvento(numDia,consultation,consultasDr);
+					calendarioModif.add(evento);	}
+				}
 		
 	}
 	
