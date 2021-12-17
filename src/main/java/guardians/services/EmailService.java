@@ -1,6 +1,7 @@
 package guardians.services;
 
 
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -89,7 +90,9 @@ public class EmailService
 	    transport.connect();
 		transport.sendMessage(message, message.getAllRecipients());
 	    transport.close();
+	    
 	  log.info("Email enviado a: "+emailTo);
+	  eliminaFichero(nomFich);
 	  } catch (AddressException e)
 	{
 		// TODO Auto-generated catch block
@@ -113,5 +116,12 @@ public class EmailService
 
 	public void setMensaje(String mensaje) {
 		this.mensaje = mensaje;
+	}
+	
+	private void eliminaFichero(String nombre) {
+		File file = new File(nombre);   
+		if (file.exists()) {
+			file.delete();
+		}
 	}
 }

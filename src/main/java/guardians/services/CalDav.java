@@ -1,22 +1,20 @@
 package guardians.services;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.YearMonth;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAmount;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.function.Predicate;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.BasicCredentialsProvider;
@@ -31,25 +29,31 @@ import com.github.caldav4j.methods.HttpGetMethod;
 import com.github.caldav4j.methods.HttpPutMethod;
 import com.github.caldav4j.model.request.CalendarRequest;
 
+import guardians.MetodosCalendario;
 import lombok.extern.slf4j.Slf4j;
-import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.filter.Filter;
-import net.fortuna.ical4j.filter.HasPropertyRule;
-import net.fortuna.ical4j.filter.PeriodRule;
+import net.fortuna.ical4j.filter.FilterExpression;
+import net.fortuna.ical4j.filter.predicate.PeriodRule;
+import net.fortuna.ical4j.filter.predicate.PropertyEqualToRule;
+import net.fortuna.ical4j.filter.predicate.PropertyExistsRule;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
-import net.fortuna.ical4j.model.ComponentList;
+import net.fortuna.ical4j.model.ConstraintViolationException;
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Property;
+import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.component.CalendarComponent;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.Attendee;
 import net.fortuna.ical4j.model.property.Uid;
-import net.fortuna.ical4j.validate.ValidationException;
+
 /**
  * Esta clase se encarga de interactuar con el servidor CalDAV 
  * 
  * @author carcohcal
  */
+@SuppressWarnings("deprecation")
 @Slf4j
 @Service
 public class CalDav {
@@ -57,12 +61,17 @@ public class CalDav {
 	private String uri;
 	@Autowired
 	private EmailService emailController;
+	@Autowired
+	private MetodosCalendario metodos;
+	
 
 	/**
 	 *  Este método se encarga de publicar el calendario en el servidor
 	 * @param calendar
+	 * @throws IOException 
+	 * @throws ClientProtocolException 
 	 */
-public void publicarCalendario(Calendar calendar) {
+public void publicarCalendario(Calendar calendar) throws ClientProtocolException, IOException {
 
 	CalendarRequest cr = new CalendarRequest(calendar);
 	CalDAV4JMethodFactory factory = new CalDAV4JMethodFactory();
@@ -81,156 +90,117 @@ public void publicarCalendario(Calendar calendar) {
 	.build();
 	log.info("Cliente HTTP PUT "+client);
 	
-	HttpResponse response;
-	try {
-		
-		response = client.execute(method); 
+	HttpResponse response = client.execute(method); 
 		log.info("Respuesta peticion PUT: "+response);
-	} catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}  
+	
 }
 
 /**
  *  Este método permite recuperar el calendario de un doctor para un mes concreto através de su email
  * @param mesAnio
  * @param email
+ * @throws IOException 
+ * @throws URISyntaxException 
+ * @throws CalDAV4JException 
+ * @throws ParserException 
  */
 
-@SuppressWarnings({ "deprecation", "rawtypes" })
-public void recuperarCalendario(YearMonth mesAnio, String email) {
+@SuppressWarnings({ "deprecation", "rawtypes", "unchecked" })
+public void recuperarCalendario(YearMonth mesAnio, String email) throws IOException, URISyntaxException, ParserException, CalDAV4JException {
 
 
-	Calendar calendar = null;
-	CalDAV4JMethodFactory factory = new CalDAV4JMethodFactory();
-	HttpGetMethod method = factory.createGetMethod(uri);
-	CredentialsProvider provider = new BasicCredentialsProvider();
-	provider.setCredentials(
-	        AuthScope.ANY,
-	        new UsernamePasswordCredentials("usuario", "usuario")
-	);
-
-	HttpClient client = HttpClientBuilder.create()
-	.setDefaultCredentialsProvider(provider)
-	.disableAuthCaching()
-	.build();
-	log.info("Cliente HTTP GET "+client);
-	// Execute the method.
-	HttpResponse response;
-	try {
-		response = client.execute(method);
-		log.info("Respuesta peticion GET: "+response);
-		// Retrieve the Calendar from the response.
-		calendar = method.getResponseBodyAsCalendar(response);
-	} catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	} catch (ParserException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	} catch (CalDAV4JException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
+	
+	// Retrieve the Calendar from the response.
+	metodos.init();
+	Calendar calendar = metodos.getCalendario();
+	
 	
 	log.info("Fecha: "+mesAnio);
-	LocalDateTime today = LocalDateTime.of(mesAnio.getYear(), mesAnio.getMonth(), 1, 0, 0);
-	TemporalAmount duration=  Period.ofMonths(1);
-	net.fortuna.ical4j.model.Period period = new net.fortuna.ical4j.model.Period(today,  duration);
+	DateTime start = new DateTime();
+	start.setTime(metodos.fecha(mesAnio.getYear(), mesAnio.getMonthValue(), 1).getTime());
+	YearMonth yearMonthObject = YearMonth.of(mesAnio.getYear(), mesAnio.getMonthValue());
+	int daysInMonth = yearMonthObject.lengthOfMonth();
+	DateTime duration=  new DateTime();
+	duration.setTime(metodos.fecha(mesAnio.getYear(), mesAnio.getMonthValue(), daysInMonth+1).getTime());
+	net.fortuna.ical4j.model.Period period = new net.fortuna.ical4j.model.Period(start,  duration);
 	Filter filter = new Filter(new PeriodRule(period));
 	Collection eventsToday = filter.filter(calendar.getComponents(Component.VEVENT));
 	
-	String nomFich = null;
-	try {
-		Attendee a1 = new Attendee(new URI("mailto:"+email));
-		 Predicate<CalendarComponent> attendee1RuleMatch = new HasPropertyRule(a1);
-		Filter filtro = new Filter<CalendarComponent>(new Predicate[] { attendee1RuleMatch}, Filter.MATCH_ALL);
+	 	
+	Attendee a1 = new Attendee(new URI("mailto:"+email));
+	 Predicate<Component> attendee1RuleMatch = new PropertyEqualToRule<>(a1);
+	FilterExpression p = FilterExpression.contains(Property.ATTENDEE, email);
+	Filter<CalendarComponent> filtro = new Filter<CalendarComponent>(new Predicate[] { attendee1RuleMatch}, Filter.MATCH_ALL);
+	
+	Collection eventosDoctor = filtro.filter(eventsToday);		
+	
+	emailController.init();
+	String	nomFich = "calendario"+mesAnio.toString()+".ics";
+	
+	
+	  
+	 Calendar calendarioDoctor = new Calendar();
+	Iterator  iterador = eventosDoctor.iterator();
+	while(iterador.hasNext()) {
+		VEvent evento = (VEvent) iterador.next();
+		PropertyList<Property> asistentes = evento.getProperties(Property.ATTENDEE);
 		
-		Collection eventosDoctor = filtro.filter(eventsToday);		
+		for(int i=0; i<asistentes.size(); i++) {
+			evento.getProperties().remove(asistentes.get(i));
+			log.info("control");
+		}
+		calendarioDoctor.getComponents().add(evento );
+	}
+	  
+	
+	
+	metodos.generaFichero(calendarioDoctor, nomFich);
+	log.info("Fichero creaado con nombre "+nomFich);
+	  //Se envia por email el calendario individual
+	  emailController.enviarEmail(email, nomFich);
+	  	
+}
+
+
+/**
+ * Esta función recupera el evento a modificar
+ *  @author carcohcal
+ *  
+ * @return
+ * @throws IOException 
+ * @throws ClientProtocolException 
+ * @throws CalDAV4JException 
+ * @throws ParserException 
+ * @throws ConstraintViolationException 
+ */
+@SuppressWarnings({ "rawtypes", "unchecked" })
+public Calendar getEvento() throws ClientProtocolException, IOException, ParserException, CalDAV4JException, ConstraintViolationException {
+	
+	
+	// Retrieve the Calendar from the response.
+	metodos.init();
+		Calendar calendar = metodos.getCalendario();
+	
 		
-		CalendarOutputter outputter = new CalendarOutputter();	
-		outputter.setValidating(false);
-		emailController.init();
-		nomFich = "calendario"+mesAnio.toString()+".ics";
-		FileOutputStream fout = new FileOutputStream(nomFich);
-		
-		  
-		 Calendar calendarioDoctor = new Calendar();
-		Iterator  iterador = eventosDoctor.iterator();
+	Uid   uid = new Uid("1052022jc");
+    
+	PropertyExistsRule eventRuleMatch = new PropertyExistsRule(uid);
+	Filter filtro = new Filter<CalendarComponent>(new Predicate[] { eventRuleMatch}, Filter.MATCH_ALL);
+	
+	
+	Collection eventosDoctor = filtro.filter(calendar.getComponents(Component.VEVENT));
+	
+	 Calendar calendarioDoctor = calendar;
+	
+	 
+	// calendarioDoctor.add(id);
+	/*	Iterator  iterador = eventosDoctor.iterator();
 		while(iterador.hasNext()) {
 			VEvent evento = (VEvent) iterador.next();
 			calendarioDoctor.add(evento );
-		}
-		  
-		outputter.output(calendarioDoctor, fout);
-		log.info("Fichero creaado con nombre "+nomFich);
-		  //Se envia por email el calendario individual
-		  emailController.enviarEmail(email, nomFich);
-		  fout.close();
-	} catch (URISyntaxException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	} catch (FileNotFoundException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	} catch (ValidationException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	} catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-
-
-
-
-
-	}
-
-public void getEvento() {
-	// TODO Auto-generated method stub
-	Calendar calendar = null;
-	CalDAV4JMethodFactory factory = new CalDAV4JMethodFactory();
-	HttpGetMethod method = factory.createGetMethod(uri);
-	CredentialsProvider provider = new BasicCredentialsProvider();
-	provider.setCredentials(
-	        AuthScope.ANY,
-	        new UsernamePasswordCredentials("usuario", "usuario")
-	);
-
-	HttpClient client = HttpClientBuilder.create()
-	.setDefaultCredentialsProvider(provider)
-	.disableAuthCaching()
-	.build();
-	log.info("Cliente HTTP GET "+client);
-	// Execute the method.
-	HttpResponse response;
-	try {
-		response = client.execute(method);
-		log.info("Respuesta peticion GET: "+response);
-		// Retrieve the Calendar from the response.
-		calendar = method.getResponseBodyAsCalendar(response);
-	} catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	} catch (ParserException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	} catch (CalDAV4JException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
+		}*/
 	
-		
-	Uid   uid = new Uid("1122021jc");
-    
-	Predicate<CalendarComponent> eventRuleMatch = new HasPropertyRule(uid);
-	Filter filtro = new Filter<CalendarComponent>(new Predicate[] { eventRuleMatch}, Filter.MATCH_ALL);
 	
-	Collection evento = filtro.filter(calendar.getComponents(Component.VEVENT));
-	
-	System.out.println(evento);
-	
+	return calendarioDoctor;
 }
 }

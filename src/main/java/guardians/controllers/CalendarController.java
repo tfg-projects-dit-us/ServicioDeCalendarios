@@ -1,5 +1,7 @@
 package guardians.controllers;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.YearMonth;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.github.caldav4j.exceptions.CalDAV4JException;
+
 import guardians.controllers.assemblers.CalendarAssembler;
 import guardians.controllers.exceptions.CalendarAlreadyExistsException;
 import guardians.controllers.exceptions.CalendarNotFoundException;
@@ -36,6 +40,7 @@ import guardians.model.entities.primarykeys.CalendarPK;
 import guardians.model.repositories.CalendarRepository;
 import guardians.services.CalDav;
 import lombok.extern.slf4j.Slf4j;
+import net.fortuna.ical4j.data.ParserException;
 
 // TODO Create integration test for CalendarController
 
@@ -195,12 +200,16 @@ public class CalendarController {
 	 * @author carcohcal
 	 * @param yearMonth The year and month of this schedule. E.g. 2020-06
 	 * @return The found {@link Schedule}
+	 * @throws URISyntaxException 
+	 * @throws IOException 
+	 * @throws CalDAV4JException 
+	 * @throws ParserException 
 	 * @throws ScheduleNotFoundException if the {@link Schedule} has not been
 	 *                                   generated yet
 	 */
 	@ResponseBody
 	@GetMapping("/individual/{yearMonth}")
-	public String getCalendario(@PathVariable YearMonth yearMonth,@RequestBody String email) {
+	public String getCalendario(@PathVariable YearMonth yearMonth,@RequestBody String email) throws IOException, URISyntaxException, ParserException, CalDAV4JException {
 		log.info("Request received: get schedule of " + yearMonth);
 		
 		servidorCalendario.recuperarCalendario(yearMonth,email);

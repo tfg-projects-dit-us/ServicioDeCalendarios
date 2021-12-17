@@ -1,7 +1,5 @@
 package guardians.controllers;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
@@ -19,12 +17,10 @@ import javax.validation.Validator;
 
 import org.apache.http.client.ClientProtocolException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,7 +28,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -45,7 +40,6 @@ import guardians.controllers.exceptions.InvalidScheduleStatusException;
 import guardians.controllers.exceptions.InvalidScheduleStatusTransitionException;
 import guardians.controllers.exceptions.ScheduleAlreadyExistsException;
 import guardians.controllers.exceptions.ScheduleNotFoundException;
-
 import guardians.model.dtos.general.SchedulePublicDTO;
 import guardians.model.dtos.general.ScheduleSummaryPublicDTO;
 import guardians.model.entities.Calendar;
@@ -55,7 +49,6 @@ import guardians.model.entities.ScheduleDay;
 import guardians.model.entities.primarykeys.CalendarPK;
 import guardians.model.repositories.CalendarRepository;
 import guardians.model.repositories.ScheduleRepository;
-import guardians.services.CalDav;
 import guardians.services.calendarioGeneral;
 import lombok.extern.slf4j.Slf4j;
 import net.fortuna.ical4j.data.ParserException;
@@ -260,12 +253,7 @@ public class ScheduleController {
 			savedSchedule = scheduleRepository.save(schedule);
 			log.info("The persisted schedule is: " + savedSchedule);
 			
-			/**@author carcohcal**/
-			
-			log.info("Intento de actualizar calendario en el servidor");
-			
-			calendarService.actualizarCalendario(schedule);
-		}
+					}
 
 		return scheduleAssembler.toModel(new SchedulePublicDTO(savedSchedule));
 	}
