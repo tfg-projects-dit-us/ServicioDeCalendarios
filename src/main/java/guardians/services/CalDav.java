@@ -78,7 +78,6 @@ public void publicarCalendario(Calendar calendar) throws ClientProtocolException
 	CalDAV4JMethodFactory factory = new CalDAV4JMethodFactory();
 	HttpPutMethod method = factory.createPutMethod(uri, cr);
 
-	HttpPostMethod post = factory.createPostMethod(uri, cr);
 	CredentialsProvider provider = new BasicCredentialsProvider();
 	provider.setCredentials(
 	        AuthScope.ANY,
@@ -107,14 +106,14 @@ public void publicarCalendario(Calendar calendar) throws ClientProtocolException
  */
 
 @SuppressWarnings({ "deprecation", "rawtypes", "unchecked" })
-public void recuperarCalendario(YearMonth mesAnio, String email) throws IOException, URISyntaxException, ParserException, CalDAV4JException {
+public boolean recuperarCalendario(YearMonth mesAnio, String email) throws IOException, URISyntaxException, ParserException, CalDAV4JException {
 
 
 	
 	// Retrieve the Calendar from the response.
 	metodos.init();
 	Calendar calendar = metodos.getCalendario();
-	
+	boolean existe = false;
 	
 	log.info("Fecha: "+mesAnio);
 	DateTime start = new DateTime();
@@ -134,32 +133,32 @@ public void recuperarCalendario(YearMonth mesAnio, String email) throws IOExcept
 	Filter<CalendarComponent> filtro = new Filter<CalendarComponent>(new Predicate[] { attendee1RuleMatch}, Filter.MATCH_ALL);
 	
 	Collection eventosDoctor = filtro.filter(eventsToday);		
-	
-	emailController.init();
-	String	nomFich = "calendario"+mesAnio.toString()+".ics";
-	
-	
-	  
-	 Calendar calendarioDoctor = new Calendar();
-	Iterator  iterador = eventosDoctor.iterator();
-	while(iterador.hasNext()) {
-		VEvent evento = (VEvent) iterador.next();
-		PropertyList<Property> asistentes = evento.getProperties(Property.ATTENDEE);
+	if(eventosDoctor.size()!=0) {
 		
-		for(int i=0; i<asistentes.size(); i++) {
-			evento.getProperties().remove(asistentes.get(i));
-			log.info("control");
+		emailController.init();
+		String	nomFich = "calendario"+mesAnio.toString()+".ics";
+		
+		Calendar calendarioDoctor = new Calendar();
+		Iterator  iterador = eventosDoctor.iterator();
+		while(iterador.hasNext()) {
+			VEvent evento = (VEvent) iterador.next();
+			PropertyList<Property> asistentes = evento.getProperties(Property.ATTENDEE);
+			
+			for(int i=0; i<asistentes.size(); i++) {
+				evento.getProperties().remove(asistentes.get(i));
+				log.info("control");
+			}
+			calendarioDoctor.getComponents().add(evento );
 		}
-		calendarioDoctor.getComponents().add(evento );
+		metodos.generaFichero(calendarioDoctor, nomFich);
+		
+		log.info("Fichero creaado con nombre "+nomFich);
+		
+		//Se envia por email el calendario individual
+		emailController.enviarEmail(email, nomFich);
+		existe=true;
 	}
-	  
-	
-	
-	metodos.generaFichero(calendarioDoctor, nomFich);
-	log.info("Fichero creaado con nombre "+nomFich);
-	  //Se envia por email el calendario individual
-	  emailController.enviarEmail(email, nomFich);
-	  	
+	return existe;
 }
 
 
