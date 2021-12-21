@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import com.github.caldav4j.exceptions.CalDAV4JException;
 import com.github.caldav4j.methods.CalDAV4JMethodFactory;
 import com.github.caldav4j.methods.HttpGetMethod;
+import com.github.caldav4j.methods.HttpPostMethod;
 import com.github.caldav4j.methods.HttpPutMethod;
 import com.github.caldav4j.model.request.CalendarRequest;
 
@@ -77,7 +78,7 @@ public void publicarCalendario(Calendar calendar) throws ClientProtocolException
 	CalDAV4JMethodFactory factory = new CalDAV4JMethodFactory();
 	HttpPutMethod method = factory.createPutMethod(uri, cr);
 
-	
+	HttpPostMethod post = factory.createPostMethod(uri, cr);
 	CredentialsProvider provider = new BasicCredentialsProvider();
 	provider.setCredentials(
 	        AuthScope.ANY,
@@ -88,7 +89,7 @@ public void publicarCalendario(Calendar calendar) throws ClientProtocolException
 	.setDefaultCredentialsProvider(provider)
 	.disableAuthCaching()
 	.build();
-	log.info("Cliente HTTP PUT "+client);
+	log.debug("Cliente HTTP PUT "+client);
 	
 	HttpResponse response = client.execute(method); 
 		log.info("Respuesta peticion PUT: "+response);

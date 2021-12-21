@@ -28,6 +28,12 @@ import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Date;
+import net.fortuna.ical4j.model.TimeZoneRegistry;
+import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
+import net.fortuna.ical4j.model.component.VTimeZone;
+import net.fortuna.ical4j.model.property.CalScale;
+import net.fortuna.ical4j.model.property.ProdId;
+import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.validate.ValidationException;
 
 @Service
@@ -77,8 +83,6 @@ public class MetodosCalendario {
 		CalDAV4JMethodFactory factory = new CalDAV4JMethodFactory();
 		HttpGetMethod method = factory.createGetMethod(uri);
 		
-		
-		
 		CredentialsProvider provider = new BasicCredentialsProvider();
 		provider.setCredentials(
 		        AuthScope.ANY,
@@ -94,20 +98,38 @@ public class MetodosCalendario {
 		
 		// Execute the method.
 		HttpResponse response = client.execute(method);
-		// Retrieve the Calendar from the response.
+		Calendar calendario = null;
+		if (response.getStatusLine().getStatusCode() == 404)
+		{
+			calendario = new Calendar();
+			calendario.getProperties().add(new ProdId("-//Calendario Guardias//"));
+			calendario.getProperties().add(Version.VERSION_2_0);
+			calendario.getProperties().add(CalScale.GREGORIAN);
+			
+			TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
 
-		HttpEntity entity = response.getEntity();
+			
+			VTimeZone tz = registry.getTimeZone("Europe/Madrid").getVTimeZone();
+			calendario.getComponents().add(tz);
+
+
+		}else {
+			// Retrieve the Calendar from the response.
+
+			HttpEntity entity = response.getEntity();
+			
+			
+			// Read the contents of an entity and return it as a String.
+			String content = EntityUtils.toString(entity);
+			
+			
+			StringReader stream = new StringReader(content) ;
+			
+			CalendarBuilder builder = new CalendarBuilder();
+			
+			 calendario = builder.build(stream);
+		}
 		
-		
-		// Read the contents of an entity and return it as a String.
-		String content = EntityUtils.toString(entity);
-		
-		
-		StringReader stream = new StringReader(content) ;
-		
-		CalendarBuilder builder = new CalendarBuilder();
-		
-		Calendar calendario = builder.build(stream);
 		return calendario;
 	}
 	
