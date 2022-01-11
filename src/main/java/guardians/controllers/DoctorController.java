@@ -384,7 +384,7 @@ public class DoctorController {
 	 * 
 	 * @param telegramID the telegram id of the {@link Doctor} to update
 	 * 
-	 * 
+	 * @param doctorId of the doctor 
 	 * @return true if the operation is successful or false otherwise 
 	 * @author carcohcal
 	 * 

@@ -75,7 +75,7 @@ public class calendarioGeneral {
 		
 		}
   /**
-   *   
+   * Construye el objeto calendario
    * @throws IOException
    * @throws GeneralSecurityException
    * @throws InterruptedException

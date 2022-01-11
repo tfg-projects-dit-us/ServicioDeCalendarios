@@ -199,6 +199,7 @@ public class CalendarController {
 	 * This method handles GET requests of a specific {@link Schedule}
 	 * @author carcohcal
 	 * @param yearMonth The year and month of this schedule. E.g. 2020-06
+	 * @param email the email of the doctor which calendar it's needed
 	 * @return The found {@link Schedule}
 	 * @throws URISyntaxException 
 	 * @throws IOException 

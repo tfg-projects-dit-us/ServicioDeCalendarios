@@ -17,7 +17,7 @@ import org.springframework.context.annotation.ComponentScan;
 public class GuardiansApplication {
 	public static void main(String[] args) {
 		// The server will use the UTC timezone
-		TomcatURLStreamHandlerFactory.disable();
+		//TomcatURLStreamHandlerFactory.disable();
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 		SpringApplication.run(GuardiansApplication.class, args);
 	}

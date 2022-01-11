@@ -33,6 +33,8 @@ import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ConstraintViolationException;
+import net.fortuna.ical4j.model.Property;
+import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.component.CalendarComponent;
 import net.fortuna.ical4j.model.component.VEvent;
 
@@ -70,39 +72,41 @@ public class EventControlles {
 		
 		Calendar calendar = metodos.getCalendario();
 		String json2 = ICALaJSON(calendar);
-		JSONaIcal(json2);
-				
+		Calendar calendario = JSONaIcal(json);
+		
+		log.debug("Control");
 		
 		}
 	
-	private void JSONaIcal(String json) throws JsonMappingException, JsonProcessingException {
-		
-		SimpleModule module = new SimpleModule();
-		module.addSerializer(VEvent.class, new JSEventSerializer(VEvent.class));
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.registerModule(module);
-
-
-		VEvent calendar = mapper.readValue(json, VEvent.class);
-		log.info("CONTROL");
-		
-	}
+	
 	
 	private String ICALaJSON(Calendar calendar) throws JsonProcessingException {
 		
 		SimpleModule module = new SimpleModule();
-		module.addSerializer(new JCalSerializer((Calendar.class)));
+		module.addSerializer(Calendar.class, new JCalSerializer(Calendar.class));
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(module);
-
-		String serialized = mapper.writeValueAsString(calendar.getComponents(Component.VEVENT).get(0));
+		
+		Property dt = calendar.getComponents(Component.VEVENT).get(0).getProperties(Property.DTSTAMP).get(0);
+		calendar.getComponents(Component.VEVENT).get(0).getProperties().remove(dt);
+		String serialized = mapper.writeValueAsString(calendar);
 		
 		System.out.println(serialized);
 		
-		
-		
-		
 		return serialized;
+		
+	}
+	private Calendar JSONaIcal(String json) throws JsonMappingException, JsonProcessingException {
+		
+		SimpleModule module = new SimpleModule();
+		module.addDeserializer(Calendar.class, new JCalMapper(Calendar.class));
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.registerModule(module);
+
+
+		Calendar calendar = mapper.readValue(json, Calendar.class);
+		return calendar;
+		
 		
 	}
 }
