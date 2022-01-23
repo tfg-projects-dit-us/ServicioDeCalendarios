@@ -21,6 +21,7 @@ import com.github.caldav4j.exceptions.CalDAV4JException;
 
 import guardians.MetodosCalendario;
 import guardians.controllers.exceptions.DoctorNotFoundException;
+import guardians.controllers.exceptions.EventNotFoundException;
 import guardians.model.entities.Doctor;
 import guardians.model.entities.Schedule;
 import guardians.model.entities.ScheduleDay;
@@ -170,7 +171,7 @@ public void creaCalendario() throws IOException, GeneralSecurityException, Inter
 
 	
 	
-	public String actualizarCalendario(Calendar eventosModificado) throws ClientProtocolException, IOException, ParserException, URISyntaxException {
+	public String actualizarCalendario(Calendar eventosModificado) throws ClientProtocolException, IOException, ParserException, URISyntaxException, EventNotFoundException {
 		Calendar calendarOriginal = metodos.getCalendario();
 		
 		Calendar calendarioModif = eventosModificado;  
@@ -192,7 +193,8 @@ public void creaCalendario() throws IOException, GeneralSecurityException, Inter
 				comprobarDoctores (dr_nuevos);
 				System.out.println(id.getValue());
 			}else {
-				mensaje = "No hay evento con el id: " + id.getValue() + "para la siguiente fecha: " + fecha.getValue();
+				throw new EventNotFoundException(id.getValue(),fecha.getValue());
+				
 			}
 			System.out.println(id.getValue());
 	   }

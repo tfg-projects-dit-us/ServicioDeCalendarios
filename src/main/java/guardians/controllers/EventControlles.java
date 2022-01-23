@@ -36,6 +36,7 @@ import com.github.caldav4j.exceptions.CalDAV4JException;
 
 import antlr.debug.Event;
 import guardians.MetodosCalendario;
+import guardians.controllers.exceptions.EventNotFoundException;
 import guardians.model.dtos.general.CalendarPublicDTO;
 import guardians.services.CalDav;
 import guardians.services.CalendariosIndivuales;
@@ -78,9 +79,10 @@ public class EventControlles {
  * @throws CalDAV4JException
  * @throws ConstraintViolationException
  * @throws URISyntaxException 
+ * @throws EventNotFoundException 
  */
 	@PostMapping("/update")
-	public String updateEvent(@RequestBody String eventos	) throws ClientProtocolException, IOException, ParserException, CalDAV4JException, ConstraintViolationException, URISyntaxException {
+	public String updateEvent(@RequestBody String eventos	) throws ClientProtocolException, IOException, ParserException, CalDAV4JException, ConstraintViolationException, URISyntaxException, EventNotFoundException {
 		log.info("Método PUT evento");
 		
 		Calendar calendario = StringaCal(eventos);
