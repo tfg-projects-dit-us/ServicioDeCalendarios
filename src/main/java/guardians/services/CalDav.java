@@ -3,10 +3,7 @@ package guardians.services;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.Period;
 import java.time.YearMonth;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.function.Predicate;
@@ -25,8 +22,6 @@ import org.springframework.stereotype.Service;
 
 import com.github.caldav4j.exceptions.CalDAV4JException;
 import com.github.caldav4j.methods.CalDAV4JMethodFactory;
-import com.github.caldav4j.methods.HttpGetMethod;
-import com.github.caldav4j.methods.HttpPostMethod;
 import com.github.caldav4j.methods.HttpPutMethod;
 import com.github.caldav4j.model.request.CalendarRequest;
 
@@ -34,7 +29,6 @@ import guardians.MetodosCalendario;
 import lombok.extern.slf4j.Slf4j;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.filter.Filter;
-import net.fortuna.ical4j.filter.FilterExpression;
 import net.fortuna.ical4j.filter.predicate.PeriodRule;
 import net.fortuna.ical4j.filter.predicate.PropertyEqualToRule;
 import net.fortuna.ical4j.filter.predicate.PropertyExistsRule;
@@ -105,7 +99,7 @@ public void publicarCalendario(Calendar calendar) throws ClientProtocolException
  * @throws ParserException 
  */
 
-@SuppressWarnings({ "deprecation", "rawtypes", "unchecked" })
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public boolean recuperarCalendario(YearMonth mesAnio, String email) throws IOException, URISyntaxException, ParserException, CalDAV4JException {
 
 
@@ -129,7 +123,6 @@ public boolean recuperarCalendario(YearMonth mesAnio, String email) throws IOExc
 	 	
 	Attendee a1 = new Attendee(new URI("mailto:"+email));
 	 Predicate<Component> attendee1RuleMatch = new PropertyEqualToRule<>(a1);
-	FilterExpression p = FilterExpression.contains(Property.ATTENDEE, email);
 	Filter<CalendarComponent> filtro = new Filter<CalendarComponent>(new Predicate[] { attendee1RuleMatch}, Filter.MATCH_ALL);
 	
 	Collection eventosDoctor = filtro.filter(eventsToday);		

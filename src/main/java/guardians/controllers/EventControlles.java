@@ -1,15 +1,26 @@
 package guardians.controllers;
 
 import java.io.IOException;
+import java.io.StringReader;
+import java.net.URISyntaxException;
 import java.time.YearMonth;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONPointer;
 import org.mnode.ical4j.serializer.JCalMapper;
 import org.mnode.ical4j.serializer.JCalSerializer;
 import org.mnode.ical4j.serializer.jscalendar.JSEventBuilder;
 import org.mnode.ical4j.serializer.jscalendar.JSEventSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +39,9 @@ import guardians.MetodosCalendario;
 import guardians.model.dtos.general.CalendarPublicDTO;
 import guardians.services.CalDav;
 import guardians.services.CalendariosIndivuales;
+import guardians.services.calendarioGeneral;
 import lombok.extern.slf4j.Slf4j;
+import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
@@ -51,34 +64,37 @@ import net.fortuna.ical4j.model.component.VEvent;
 public class EventControlles {
 	
 	@Autowired
-	private CalDav servicioCalendario;
+	private calendarioGeneral servicioCalendario;
 	@Autowired
 	private MetodosCalendario metodos;
-
-	/**
-	 * This method will handle requests to update an existing {@link CalendariosIndivuales}
-	 * 
-	 * @param yearMonth the year and month of the calendar to be updated
-	 * @throws CalDAV4JException 
-	 * @throws ParserException 
-	 * @throws IOException 
-	 * @throws ClientProtocolException 
-	 * @throws ConstraintViolationException 
-	 */
-	@PutMapping("/{yearMonth}")
-	public void updateEvent(@PathVariable YearMonth yearMonth,
-			@RequestBody String json	) throws ClientProtocolException, IOException, ParserException, CalDAV4JException, ConstraintViolationException {
+/**
+ * 
+ * @param yearMonth
+ * @param json
+ * @return 
+ * @throws ClientProtocolException
+ * @throws IOException
+ * @throws ParserException
+ * @throws CalDAV4JException
+ * @throws ConstraintViolationException
+ * @throws URISyntaxException 
+ */
+	@PostMapping("/update")
+	public String updateEvent(@RequestBody String eventos	) throws ClientProtocolException, IOException, ParserException, CalDAV4JException, ConstraintViolationException, URISyntaxException {
 		log.info("Método PUT evento");
 		
-		Calendar calendar = metodos.getCalendario();
-		String json2 = ICALaJSON(calendar);
-		Calendar calendario = JSONaIcal(json);
-		
-		log.debug("Control");
+		Calendar calendario = StringaCal(eventos);
+		log.debug("Calendario creado ok");
+		return servicioCalendario.actualizarCalendario(calendario);
 		
 		}
 	
-	
+ /**
+  * Método para convertir un calendario ical4j a json	
+  * @param calendar
+  * @return
+  * @throws JsonProcessingException
+  */
 	
 	private String ICALaJSON(Calendar calendar) throws JsonProcessingException {
 		
@@ -87,26 +103,44 @@ public class EventControlles {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(module);
 		
-		Property dt = calendar.getComponents(Component.VEVENT).get(0).getProperties(Property.DTSTAMP).get(0);
-		calendar.getComponents(Component.VEVENT).get(0).getProperties().remove(dt);
-		String serialized = mapper.writeValueAsString(calendar);
-		
-		System.out.println(serialized);
-		
+		String serialized = mapper.writeValueAsString(calendar);	
 		return serialized;
 		
 	}
+	/**
+	 * 
+	 * @param json del calendario
+	 * @return
+	 * @throws JsonMappingException
+	 * @throws JsonProcessingException
+	 */
 	private Calendar JSONaIcal(String json) throws JsonMappingException, JsonProcessingException {
 		
+		JSONArray array = new JSONArray(json);
 		SimpleModule module = new SimpleModule();
 		module.addDeserializer(Calendar.class, new JCalMapper(Calendar.class));
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(module);
-
-
 		Calendar calendar = mapper.readValue(json, Calendar.class);
 		return calendar;
-		
-		
 	}
+	
+	/**
+	 * 
+	 * @param content es un String que contiene los eventos/calendario en formato ical
+	 * @return
+	 * @throws IOException
+	 * @throws ParserException
+	 */
+	
+	 private Calendar StringaCal(String content) throws IOException, ParserException {
+		
+			
+			StringReader stream = new StringReader(content) ;
+			
+			CalendarBuilder builder = new CalendarBuilder();
+			
+			 Calendar calendario = builder.build(stream);
+		 return calendario;
+	 }
 }
