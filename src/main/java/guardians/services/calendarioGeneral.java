@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,12 +30,9 @@ import guardians.model.repositories.DoctorRepository;
 import lombok.extern.slf4j.Slf4j;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.filter.Filter;
-import net.fortuna.ical4j.filter.predicate.PropertyContainsRule;
-import net.fortuna.ical4j.filter.predicate.PropertyExistsRule;
 import net.fortuna.ical4j.filter.predicate.PropertyMatchesRule;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
-import net.fortuna.ical4j.model.ComponentContainer;
 import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.PropertyList;
@@ -43,8 +41,10 @@ import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.parameter.Cn;
 import net.fortuna.ical4j.model.parameter.CuType;
 import net.fortuna.ical4j.model.property.Attendee;
+import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Uid;
 
+@SuppressWarnings("deprecation")
 @Service
 @Slf4j
 public class calendarioGeneral {
@@ -57,6 +57,7 @@ public class calendarioGeneral {
 	@Value("${calendario.tipo.shifts}")
 	private  String shifts;
 	private Schedule horario;
+	
 	private Integer anio;
 	private Integer mes;
 	@Autowired
@@ -75,22 +76,15 @@ public class calendarioGeneral {
 	}
 
 
-	private HashMap<String, String> ids;
+	private HashMap<String, String> ids= new HashMap<String, String>();
 	@Autowired
 	private MetodosCalendario metodos;
 
-	
-
-    public void init(Schedule schedule){
+	public void setHorario(Schedule schedule) {
 		this.horario = schedule;
-		ids = new HashMap<String, String>();
-		ids.put(cycle, "jc");
-		ids.put(shifts,"ca");
-		ids.put(consultation, "c");
-		metodos.init();
-		log.info("Funcion init calendarioGeneral completada");
-		
-		}
+	}
+
+   
   /**
    * Construye el objeto calendario
    * @throws IOException
@@ -101,7 +95,10 @@ public class calendarioGeneral {
    * @throws CalDAV4JException
    */
 public void creaCalendario() throws IOException, GeneralSecurityException, InterruptedException, URISyntaxException, ParserException, CalDAV4JException {
-    	
+    
+	ids.put(cycle, "jc");
+	ids.put(shifts,"ca");
+	ids.put(consultation, "c");
     	
 	Calendar calendario = metodos.getCalendario();
 	        
@@ -109,7 +106,7 @@ public void creaCalendario() throws IOException, GeneralSecurityException, Inter
     anio = horario.getYear();
     log.info("Calendario creado para: " +mes+anio);      
     
-    calIndiv.init(mes, anio);
+    calIndiv.setFecha(mes, anio);
        
     SortedSet<ScheduleDay> dias = horario.getDays();
     Iterator<ScheduleDay> iterator = dias.iterator();
@@ -156,25 +153,36 @@ public void creaCalendario() throws IOException, GeneralSecurityException, Inter
          Uid   uid = new Uid(ID);
          event.getProperties().add(uid);
             
-          VEvent event_indi = event;
+         VEvent event_indi = new VEvent( metodos.fecha(anio, mes, numDia),summary);
+         event_indi.getProperties().add(uid);
 		while(iterator.hasNext()) {
 				Doctor doctor = iterator.next();
-				calIndiv.addEvent(numDia, summary,ID,doctor);
+				
 				String nombre = doctor.getFirstName()+" "+doctor.getLastNames();
 				String email =doctor.getEmail();
 				Attendee asistente =new Attendee(URI.create("mailto:"+email));
 				asistente.getParameters(Parameter.CUTYPE).add(CuType.INDIVIDUAL);
 				asistente.getParameters(Parameter.CN).add(new Cn(nombre));
-				
+				calIndiv.addEvent(event_indi,asistente);
 				event.getProperties().add(asistente);
 			    }	
 		return event;
 	}
 
+	/**
+	 * 
+	 * @param eventosModificado
+	 * @return
+	 * @throws ClientProtocolException
+	 * @throws IOException
+	 * @throws ParserException
+	 * @throws URISyntaxException
+	 * @throws EventNotFoundException
+	 * @throws ParseException 
+	 */
 	
-	
-	@SuppressWarnings({ "rawtypes", "deprecation", "unchecked" })
-	public String modficarCalendario(Calendar eventosModificado) throws ClientProtocolException, IOException, ParserException, URISyntaxException, EventNotFoundException {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public String modficarCalendario(Calendar eventosModificado) throws ClientProtocolException, IOException, ParserException, URISyntaxException, EventNotFoundException, ParseException {
 		Calendar calendarOriginal = metodos.getCalendario();
 		
 		Calendar calendarioModif = eventosModificado;  
@@ -196,30 +204,32 @@ public void creaCalendario() throws IOException, GeneralSecurityException, Inter
 				throw new EventNotFoundException(id.getValue(),fecha.getValue());
 			}
 			
+			
 			PropertyList<Property> dr_nuevos = calendarioModif.getComponents(Component.VEVENT).get(i).getProperties(Property.ATTENDEE);
 			comprobarDoctores (dr_nuevos);
 			log.info("Doctores nuevos: "+ dr_nuevos.toString());
+			
 			PropertyList<Property> dr_originales = getEvento( eventos).getProperties(Property.ATTENDEE);
 			log.info("Doctores originales: "+dr_originales.toString());
 			
 			VEvent eventOri = getEvento(eventos);
+			VEvent eventInd = getEvento(eventos);
 			calendarOriginal.getComponents().remove(eventOri);
-			
-			for(int j=0; j<dr_originales.size(); j++) {
-				eventOri.getProperties().remove(dr_originales.get(j));
 				
-			}
-			
-			Iterator  iterador = dr_nuevos.iterator();	
+			//Añadimos los doctores nuevos
+			Iterator  iterador = comparaDoctor(dr_nuevos,dr_originales).iterator();	
 			while(iterador.hasNext()) {
-				calIndiv.addEvent(eventOri, (Attendee)iterador.next());
+				eventOri.getProperties().add((Attendee)iterador.next());	
 			}
 			
 			
-			for(int j=0; j<dr_nuevos.size(); j++) {
-				eventOri.getProperties().add(dr_nuevos.get(j));
+			//Eliminamos los doctores antiguos
+			Iterator<Property> iterator = comparaDoctor(dr_originales, dr_nuevos).iterator();
+			while(iterator.hasNext()) {
+				eventOri.getProperties().remove((Attendee)iterator.next());
 			}
 			
+						
 			calendarOriginal.getComponents().add(eventOri);	
 	   }
 	   caldav.publicarCalendario(calendarOriginal);
@@ -228,6 +238,18 @@ public void creaCalendario() throws IOException, GeneralSecurityException, Inter
 	   
 	}
 	
+	private PropertyList<Property> comparaDoctor(PropertyList<Property> doctoresLista, PropertyList<Property> docotoresEliminar) throws ParseException, IOException, URISyntaxException {
+		
+		PropertyList<Property> doctores= new PropertyList<Property> (doctoresLista);
+		doctores.removeAll(docotoresEliminar);
+
+		return doctores;
+	}
+	
+	/**
+	 * 
+	 * @param doctores
+	 */
 	private void comprobarDoctores(PropertyList<Property> doctores) {
 		
 		
@@ -244,9 +266,14 @@ public void creaCalendario() throws IOException, GeneralSecurityException, Inter
 		}}
 	}
 	
-	private VEvent getEvento( Collection eventosDoctor) {
+	/**
+	 * 
+	 * @param eventosDoctor
+	 * @return
+	 */
+	private VEvent getEvento( Collection<CalendarComponent> eventosDoctor) {
 		
-			Iterator  iterador = eventosDoctor.iterator();
+			Iterator<CalendarComponent>  iterador = eventosDoctor.iterator();
 			VEvent evento = null;
 		while(iterador.hasNext()) {
 			 evento = (VEvent) iterador.next();

@@ -105,7 +105,6 @@ public boolean recuperarCalendario(YearMonth mesAnio, String email) throws IOExc
 
 	
 	// Retrieve the Calendar from the response.
-	metodos.init();
 	Calendar calendar = metodos.getCalendario();
 	boolean existe = false;
 	
@@ -128,7 +127,7 @@ public boolean recuperarCalendario(YearMonth mesAnio, String email) throws IOExc
 	Collection eventosDoctor = filtro.filter(eventsToday);		
 	if(eventosDoctor.size()!=0) {
 		
-		emailController.init();
+		
 		String	nomFich = "calendario"+mesAnio.toString()+".ics";
 		
 		Calendar calendarioDoctor = new Calendar();
@@ -170,8 +169,7 @@ public VEvent getEvento(Uid   uid ) throws ClientProtocolException, IOException,
 	
 	
 	// Retrieve the Calendar from the response.
-	metodos.init();
-		Calendar calendar = metodos.getCalendario();
+	Calendar calendar = metodos.getCalendario();
 	
     
 	PropertyExistsRule eventRuleMatch = new PropertyExistsRule(uid);

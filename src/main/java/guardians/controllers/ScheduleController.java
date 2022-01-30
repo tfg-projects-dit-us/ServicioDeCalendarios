@@ -306,7 +306,7 @@ public class ScheduleController {
 		/**
 		 * @author Carcohcal
 		 * */
-		calendarService.init(schedule);
+		calendarService.setHorario(schedule);
 		try {
 			calendarService.creaCalendario();
 		} catch (IOException | GeneralSecurityException e) {

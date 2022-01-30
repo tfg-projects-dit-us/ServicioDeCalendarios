@@ -2,19 +2,29 @@ package guardians.services;
 
 
 import java.io.File;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.Properties;
 
-import javax.mail.*;
-import javax.mail.internet.*;
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
-
-import javax.activation.*;
 /**
  * Esta clase gestiona el envío por email de los archivos
  * 
@@ -39,7 +49,7 @@ public class EmailService
 	private  Session session;
 	
 	/**Método que configura las propiedades del servicio*/
-	public  void init() {
+	private  void setProperties() {
 		properties.put("mail.transport.protocol", "smtp");
 	    properties.put("mail.smtp.host", host);
 	    properties.put("mail.smtp.port", "587");
@@ -56,6 +66,7 @@ public class EmailService
 	 * @param nombre del fichero a enviar como archivo adjunto */
 	@Async
  public void enviarEmail(String emailTo, String nomFich){
+		setProperties();
 	  session = Session.getInstance(properties, new Authenticator() {
 		    @Override
 		    protected PasswordAuthentication getPasswordAuthentication() {

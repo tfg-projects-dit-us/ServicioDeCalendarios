@@ -3,7 +3,6 @@ package guardians;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.HashMap;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Service;
 import com.github.caldav4j.methods.CalDAV4JMethodFactory;
 import com.github.caldav4j.methods.HttpGetMethod;
 
-import guardians.services.calendarioGeneral;
 import lombok.extern.slf4j.Slf4j;
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
@@ -46,7 +44,6 @@ public class MetodosCalendario {
 	private String uri;
 	@Value("${calendario.psw}")
 	private String password;
-	private HashMap<String, String> ids;
 	@Value("${calendario.tipo.cycle}")
 	private  String cycle;
 	@Value("${calendario.tipo.consultation}")
@@ -54,13 +51,6 @@ public class MetodosCalendario {
 	@Value("${calendario.tipo.shifts}")
 	private  String shifts;
 	
-	public void init() {
-		ids = new HashMap<String, String>();
-		ids.put(cycle, "jc");
-		ids.put(shifts,"ca");
-		ids.put(consultation, "c");
-		
-	}
 
 
 	/**
@@ -78,7 +68,13 @@ public class MetodosCalendario {
 		
 		return new Date(calendar.getTime());
 	}
-	
+	/**
+	 * 
+	 * @return
+	 * @throws ClientProtocolException
+	 * @throws IOException
+	 * @throws ParserException
+	 */
 	public Calendar  getCalendario () throws ClientProtocolException, IOException, ParserException {
 		CalDAV4JMethodFactory factory = new CalDAV4JMethodFactory();
 		HttpGetMethod method = factory.createGetMethod(uri);
@@ -132,7 +128,13 @@ public class MetodosCalendario {
 		
 		return calendario;
 	}
-	
+	/**
+	 * 
+	 * @param calendario
+	 * @param nomFich
+	 * @throws ValidationException
+	 * @throws IOException
+	 */
 	public void generaFichero(Calendar calendario, String nomFich) throws ValidationException, IOException {
 		
 		FileOutputStream fout;
