@@ -213,9 +213,8 @@ public void creaCalendario() throws IOException, GeneralSecurityException, Inter
 			log.info("Doctores originales: "+dr_originales.toString());
 			
 			VEvent eventOri = getEvento(eventos);
-			VEvent eventInd = getEvento(eventos);
 			calendarOriginal.getComponents().remove(eventOri);
-				
+							
 			//Añadimos los doctores nuevos
 			Iterator  iterador = comparaDoctor(dr_nuevos,dr_originales).iterator();	
 			while(iterador.hasNext()) {
@@ -228,9 +227,11 @@ public void creaCalendario() throws IOException, GeneralSecurityException, Inter
 			while(iterator.hasNext()) {
 				eventOri.getProperties().remove((Attendee)iterator.next());
 			}
-			
-						
+								
 			calendarOriginal.getComponents().add(eventOri);	
+			
+			
+			
 	   }
 	   caldav.publicarCalendario(calendarOriginal);
 	   calIndiv.enviaCalendarios();
