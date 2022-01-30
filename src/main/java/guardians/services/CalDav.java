@@ -156,26 +156,23 @@ public boolean recuperarCalendario(YearMonth mesAnio, String email) throws IOExc
 
 
 /**
- * Esta función recupera el evento a modificar
- *  @author carcohcal
- *  
+ * 
+ * @param uid
  * @return
- * @throws IOException 
- * @throws ClientProtocolException 
- * @throws CalDAV4JException 
- * @throws ParserException 
- * @throws ConstraintViolationException 
+ * @throws ClientProtocolException
+ * @throws IOException
+ * @throws ParserException
+ * @throws CalDAV4JException
+ * @throws ConstraintViolationException
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public Calendar getEvento() throws ClientProtocolException, IOException, ParserException, CalDAV4JException, ConstraintViolationException {
+public VEvent getEvento(Uid   uid ) throws ClientProtocolException, IOException, ParserException, CalDAV4JException, ConstraintViolationException {
 	
 	
 	// Retrieve the Calendar from the response.
 	metodos.init();
 		Calendar calendar = metodos.getCalendario();
 	
-		
-	Uid   uid = new Uid("1052022jc");
     
 	PropertyExistsRule eventRuleMatch = new PropertyExistsRule(uid);
 	Filter filtro = new Filter<CalendarComponent>(new Predicate[] { eventRuleMatch}, Filter.MATCH_ALL);
@@ -183,17 +180,18 @@ public Calendar getEvento() throws ClientProtocolException, IOException, ParserE
 	
 	Collection eventosDoctor = filtro.filter(calendar.getComponents(Component.VEVENT));
 	
-	 Calendar calendarioDoctor = calendar;
-	
-	 
-	// calendarioDoctor.add(id);
-	/*	Iterator  iterador = eventosDoctor.iterator();
+	VEvent evento = null;
+	Iterator  iterador = eventosDoctor.iterator();
 		while(iterador.hasNext()) {
-			VEvent evento = (VEvent) iterador.next();
-			calendarioDoctor.add(evento );
-		}*/
+			 evento = (VEvent) iterador.next();
+			
+		}
 	
 	
-	return calendarioDoctor;
+	return evento;
+}
+
+public void actualizarEvento (VEvent event) {
+	
 }
 }

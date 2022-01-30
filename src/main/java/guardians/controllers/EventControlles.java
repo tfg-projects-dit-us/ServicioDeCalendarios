@@ -87,7 +87,7 @@ public class EventControlles {
 		
 		Calendar calendario = StringaCal(eventos);
 		log.debug("Calendario creado ok");
-		return servicioCalendario.actualizarCalendario(calendario);
+		return servicioCalendario.modficarCalendario(calendario);
 		
 		}
 	

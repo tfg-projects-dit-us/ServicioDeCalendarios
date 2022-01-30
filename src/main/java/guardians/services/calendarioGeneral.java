@@ -34,6 +34,7 @@ import net.fortuna.ical4j.filter.predicate.PropertyExistsRule;
 import net.fortuna.ical4j.filter.predicate.PropertyMatchesRule;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.ComponentContainer;
 import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.PropertyList;
@@ -153,9 +154,9 @@ public void creaCalendario() throws IOException, GeneralSecurityException, Inter
          VEvent event=new VEvent( metodos.fecha(anio, mes, numDia),summary);
          String ID = numDia.toString()+mes.toString()+anio.toString()+ ids.get(summary);
          Uid   uid = new Uid(ID);
-            event.getProperties().add(uid);
+         event.getProperties().add(uid);
             
-            
+          VEvent event_indi = event;
 		while(iterator.hasNext()) {
 				Doctor doctor = iterator.next();
 				calIndiv.addEvent(numDia, summary,ID,doctor);
@@ -164,6 +165,7 @@ public void creaCalendario() throws IOException, GeneralSecurityException, Inter
 				Attendee asistente =new Attendee(URI.create("mailto:"+email));
 				asistente.getParameters(Parameter.CUTYPE).add(CuType.INDIVIDUAL);
 				asistente.getParameters(Parameter.CN).add(new Cn(nombre));
+				
 				event.getProperties().add(asistente);
 			    }	
 		return event;
@@ -171,7 +173,8 @@ public void creaCalendario() throws IOException, GeneralSecurityException, Inter
 
 	
 	
-	public String actualizarCalendario(Calendar eventosModificado) throws ClientProtocolException, IOException, ParserException, URISyntaxException, EventNotFoundException {
+	@SuppressWarnings({ "rawtypes", "deprecation", "unchecked" })
+	public String modficarCalendario(Calendar eventosModificado) throws ClientProtocolException, IOException, ParserException, URISyntaxException, EventNotFoundException {
 		Calendar calendarOriginal = metodos.getCalendario();
 		
 		Calendar calendarioModif = eventosModificado;  
@@ -187,18 +190,40 @@ public void creaCalendario() throws IOException, GeneralSecurityException, Inter
 		  Filter filtro = new Filter<CalendarComponent>(new Predicate[] { eventRuleMatch2,eventRuleMatch}, Filter.MATCH_ALL);
 						
 			Collection eventos = filtro.filter(calendarOriginal.getComponents(Component.VEVENT));
-			if (eventos.size()!=0) {
-				
-				PropertyList<Property> dr_nuevos = calendarioModif.getComponents(Component.VEVENT).get(i).getProperties(Property.ATTENDEE);
-				comprobarDoctores (dr_nuevos);
-				System.out.println(id.getValue());
-			}else {
+			
+			/* Comprobar si hay algún evento que cumple las características*/
+			if (eventos.size()==0) {
 				throw new EventNotFoundException(id.getValue(),fecha.getValue());
+			}
+			
+			PropertyList<Property> dr_nuevos = calendarioModif.getComponents(Component.VEVENT).get(i).getProperties(Property.ATTENDEE);
+			comprobarDoctores (dr_nuevos);
+			log.info("Doctores nuevos: "+ dr_nuevos.toString());
+			PropertyList<Property> dr_originales = getEvento( eventos).getProperties(Property.ATTENDEE);
+			log.info("Doctores originales: "+dr_originales.toString());
+			
+			VEvent eventOri = getEvento(eventos);
+			calendarOriginal.getComponents().remove(eventOri);
+			
+			for(int j=0; j<dr_originales.size(); j++) {
+				eventOri.getProperties().remove(dr_originales.get(j));
 				
 			}
-			System.out.println(id.getValue());
+			
+			Iterator  iterador = dr_nuevos.iterator();	
+			while(iterador.hasNext()) {
+				calIndiv.addEvent(eventOri, (Attendee)iterador.next());
+			}
+			
+			
+			for(int j=0; j<dr_nuevos.size(); j++) {
+				eventOri.getProperties().add(dr_nuevos.get(j));
+			}
+			
+			calendarOriginal.getComponents().add(eventOri);	
 	   }
-	    
+	   caldav.publicarCalendario(calendarOriginal);
+	   calIndiv.enviaCalendarios();
 	   return mensaje;
 	   
 	}
@@ -219,4 +244,14 @@ public void creaCalendario() throws IOException, GeneralSecurityException, Inter
 		}}
 	}
 	
+	private VEvent getEvento( Collection eventosDoctor) {
+		
+			Iterator  iterador = eventosDoctor.iterator();
+			VEvent evento = null;
+		while(iterador.hasNext()) {
+			 evento = (VEvent) iterador.next();
+			
+		}
+		return evento;
+	}
 }
