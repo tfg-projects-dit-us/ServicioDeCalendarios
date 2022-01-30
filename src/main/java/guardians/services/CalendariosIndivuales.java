@@ -64,6 +64,8 @@ public class CalendariosIndivuales {
 				 emailController.enviarEmail(emails.get(i), nomFich);
 				  
 				}
+			
+			calIndividuales.clear();
 		log.info("calendarios individuales mandados a enviar");
 	}
 
@@ -105,6 +107,7 @@ public void addEvent(VEvent event, Attendee medico) {
 		calIndividuales.get(id).getComponents().add(event);
 		
 	}
+
 	
 }
 

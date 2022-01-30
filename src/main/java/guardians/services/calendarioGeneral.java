@@ -213,22 +213,29 @@ public void creaCalendario() throws IOException, GeneralSecurityException, Inter
 			log.info("Doctores originales: "+dr_originales.toString());
 			
 			VEvent eventOri = getEvento(eventos);
+			
 			calendarOriginal.getComponents().remove(eventOri);
 							
+			
 			//Añadimos los doctores nuevos
-			Iterator  iterador = comparaDoctor(dr_nuevos,dr_originales).iterator();	
+			PropertyList<Property> nuevos= comparaDoctor(dr_nuevos,dr_originales);
+			eventoIndividual(setEvento(eventOri),nuevos ,false);
+			Iterator  iterador = nuevos.iterator();	
 			while(iterador.hasNext()) {
 				eventOri.getProperties().add((Attendee)iterador.next());	
 			}
 			
 			
 			//Eliminamos los doctores antiguos
-			Iterator<Property> iterator = comparaDoctor(dr_originales, dr_nuevos).iterator();
+			PropertyList<Property> antiguos = comparaDoctor(dr_originales, dr_nuevos);
+			eventoIndividual(setEvento(eventOri),antiguos ,true);
+			Iterator<Property> iterator = antiguos.iterator();
 			while(iterator.hasNext()) {
 				eventOri.getProperties().remove((Attendee)iterator.next());
 			}
 								
 			calendarOriginal.getComponents().add(eventOri);	
+			
 			
 			
 			
@@ -281,5 +288,27 @@ public void creaCalendario() throws IOException, GeneralSecurityException, Inter
 			
 		}
 		return evento;
+	}
+	
+	private void eventoIndividual(VEvent evento,PropertyList<Property> doctores ,boolean cancel) {
+		
+		if (cancel)
+		{
+			evento.getProperties().add(Status.VEVENT_CANCELLED);
+		}
+		Iterator<Property> iterator = doctores.iterator();
+		while(iterator.hasNext()) {
+			calIndiv.addEvent(evento, (Attendee)iterator.next());
+		}
+		
+	}
+	
+	private VEvent setEvento(VEvent event) {
+		VEvent eventInd = new VEvent();
+		
+		eventInd.getProperties().add(event.getProperty(Property.DTSTART));
+		eventInd.getProperties().add(event.getProperty(Property.UID));
+		eventInd.getProperties().add(event.getProperty(Property.SUMMARY));
+		return eventInd;
 	}
 }
