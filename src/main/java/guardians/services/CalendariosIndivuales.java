@@ -45,8 +45,11 @@ public class CalendariosIndivuales {
 	@Autowired
 	private MetodosCalendario metodos;
 	
-	/** Metodo que crea los parámetros globales
-	 * @param schedule es el horario del servicio para el mes indicado*/
+	/**
+	 * 
+	 * @param mes
+	 * @param anio
+	 */
 	public void setFecha(Integer mes,Integer anio){
 		log.info("Iniciado parámetros calendario individuales");
 	}
@@ -70,7 +73,11 @@ public class CalendariosIndivuales {
 	}
 
 	
-	
+	/**
+	 * 
+	 * @param event
+	 * @param medico
+	 */
 public void addEvent(VEvent event, Attendee medico) {
 	
 	String email=medico.getCalAddress().getSchemeSpecificPart();

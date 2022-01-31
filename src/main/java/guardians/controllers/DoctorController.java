@@ -392,9 +392,9 @@ public class DoctorController {
 	 *                                 {@link Doctor}
 	 */
 	@PutMapping("/telegramID/{doctorId}")
-	public boolean addTelID(@PathVariable("doctorId") Long doctorId,
+	public String addTelID(@PathVariable("doctorId") Long doctorId,
 			@RequestBody String telegramID 	) {
-		boolean res = false;
+		
 		Optional<Doctor> doctor = null;
 				
 		log.info("Request received: return the doctor with id: " + doctorId);
@@ -406,8 +406,9 @@ public class DoctorController {
 		}else {
 			doctor.get().setTelegramId(telegramID);
 			doctorRepository.save(doctor.get());
-			res=true;
-		}
+			
+		} 
+		String res = "ID de telegram actualizado";
 				return res;
 		
 	}

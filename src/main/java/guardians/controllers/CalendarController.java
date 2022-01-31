@@ -213,12 +213,9 @@ public class CalendarController {
 	public String getCalendario(@PathVariable YearMonth yearMonth,@RequestBody String email) throws IOException, URISyntaxException, ParserException, CalDAV4JException {
 		log.info("Request received: get schedule of " + yearMonth);
 		
-		boolean existe = servidorCalendario.recuperarCalendario(yearMonth,email);
+		servidorCalendario.recuperarCalendario(yearMonth,email);
 		String respuesta = "Calendario enviado por correo al doctor.";
-		if (!existe) {
-			respuesta = "No hay eventos para el doctor solicitado";
-		}
-		
+				
 		log.info("Respuesta enviada");
 			return respuesta;
 	}

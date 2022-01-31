@@ -26,6 +26,9 @@ import com.github.caldav4j.methods.HttpPutMethod;
 import com.github.caldav4j.model.request.CalendarRequest;
 
 import guardians.MetodosCalendario;
+import guardians.controllers.exceptions.CalendarNotFoundException;
+import guardians.controllers.exceptions.DoctorNotFoundException;
+import guardians.controllers.exceptions.EventNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.filter.Filter;
@@ -100,13 +103,13 @@ public void publicarCalendario(Calendar calendar) throws ClientProtocolException
  */
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public boolean recuperarCalendario(YearMonth mesAnio, String email) throws IOException, URISyntaxException, ParserException, CalDAV4JException {
+public void recuperarCalendario(YearMonth mesAnio, String email) throws IOException, URISyntaxException, ParserException, CalDAV4JException {
 
 
 	
 	// Retrieve the Calendar from the response.
 	Calendar calendar = metodos.getCalendario();
-	boolean existe = false;
+	
 	
 	log.info("Fecha: "+mesAnio);
 	DateTime start = new DateTime();
@@ -148,9 +151,12 @@ public boolean recuperarCalendario(YearMonth mesAnio, String email) throws IOExc
 		
 		//Se envia por email el calendario individual
 		emailController.enviarEmail(email, nomFich);
-		existe=true;
+		
+	}else {
+		log.info("No hay eventos para ese doctor. Thorwing EventNotFoundException");
+		throw new CalendarNotFoundException(mesAnio.getMonth(), mesAnio.getYear(), email);
 	}
-	return existe;
+	
 }
 
 
