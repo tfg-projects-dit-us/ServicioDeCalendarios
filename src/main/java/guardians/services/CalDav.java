@@ -55,6 +55,10 @@ import net.fortuna.ical4j.model.property.Uid;
 @Slf4j
 @Service
 public class CalDav {
+	@Value("${calendario.user}")
+	private String username;
+	@Value("${calendario.psw}")
+	private String password;
 	@Value("${calendario.uri}")
 	private String uri;
 	@Autowired
@@ -78,7 +82,7 @@ public void publicarCalendario(Calendar calendar) throws ClientProtocolException
 	CredentialsProvider provider = new BasicCredentialsProvider();
 	provider.setCredentials(
 	        AuthScope.ANY,
-	        new UsernamePasswordCredentials("usuario", "usuario")
+	        new UsernamePasswordCredentials(username, password)
 	);
 
 	HttpClient client = HttpClientBuilder.create()
@@ -88,7 +92,7 @@ public void publicarCalendario(Calendar calendar) throws ClientProtocolException
 	log.debug("Cliente HTTP PUT "+client);
 	
 	HttpResponse response = client.execute(method); 
-		log.info("Respuesta peticion PUT: "+response);
+		log.debug("Respuesta peticion PUT: "+response);
 	
 }
 
@@ -141,13 +145,13 @@ public void recuperarCalendario(YearMonth mesAnio, String email) throws IOExcept
 			
 			for(int i=0; i<asistentes.size(); i++) {
 				evento.getProperties().remove(asistentes.get(i));
-				log.info("control");
+				
 			}
 			calendarioDoctor.getComponents().add(evento );
 		}
 		metodos.generaFichero(calendarioDoctor, nomFich);
 		
-		log.info("Fichero creaado con nombre "+nomFich);
+		log.info("Fichero creado con nombre "+nomFich);
 		
 		//Se envia por email el calendario individual
 		emailController.enviarEmail(email, nomFich);
@@ -159,43 +163,4 @@ public void recuperarCalendario(YearMonth mesAnio, String email) throws IOExcept
 	
 }
 
-
-/**
- * 
- * @param uid
- * @return
- * @throws ClientProtocolException
- * @throws IOException
- * @throws ParserException
- * @throws CalDAV4JException
- * @throws ConstraintViolationException
- */
-@SuppressWarnings({ "rawtypes", "unchecked" })
-public VEvent getEvento(Uid   uid ) throws ClientProtocolException, IOException, ParserException, CalDAV4JException, ConstraintViolationException {
-	
-	
-	// Retrieve the Calendar from the response.
-	Calendar calendar = metodos.getCalendario();
-	
-    
-	PropertyExistsRule eventRuleMatch = new PropertyExistsRule(uid);
-	Filter filtro = new Filter<CalendarComponent>(new Predicate[] { eventRuleMatch}, Filter.MATCH_ALL);
-	
-	
-	Collection eventosDoctor = filtro.filter(calendar.getComponents(Component.VEVENT));
-	
-	VEvent evento = null;
-	Iterator  iterador = eventosDoctor.iterator();
-		while(iterador.hasNext()) {
-			 evento = (VEvent) iterador.next();
-			
-		}
-	
-	
-	return evento;
-}
-
-public void actualizarEvento (VEvent event) {
-	
-}
 }

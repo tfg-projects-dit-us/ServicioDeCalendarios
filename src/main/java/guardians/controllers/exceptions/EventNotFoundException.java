@@ -2,7 +2,7 @@ package guardians.controllers.exceptions;
 /**
  * 
  * @author carcohcal
- *
+ * Excepción que se ejecuta cuando no existe un evento con el id y fecha indicado
  */
 public class EventNotFoundException extends NotFoundException {
 

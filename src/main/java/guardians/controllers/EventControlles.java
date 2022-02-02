@@ -32,7 +32,7 @@ import net.fortuna.ical4j.model.ConstraintViolationException;
 /**
  * The EventController will handle all requests related to  events
  * 
- * @author carmcohe
+ * @author carcohcal
  */
 @RestController
 @RequestMapping("/event")
@@ -61,7 +61,6 @@ public class EventControlles {
 		log.info("Método PUT evento");
 		
 		Calendar calendario = StringaCal(eventos);
-		log.debug("Calendario creado ok");
 		return servicioCalendario.modficarCalendario(calendario);
 		
 		}
@@ -119,6 +118,7 @@ public class EventControlles {
 			CalendarBuilder builder = new CalendarBuilder();
 			
 			 Calendar calendario = builder.build(stream);
+			 log.debug("Calendario creado");
 		 return calendario;
 	 }
 }

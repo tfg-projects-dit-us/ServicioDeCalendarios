@@ -303,26 +303,20 @@ public class ScheduleController {
 		log.info("The requested state transition is valid. Attemting to persist the schedule with its new status");
 		schedule.setStatus(newStatus);
 		Schedule savedSchedule = scheduleRepository.save(schedule);
-		/**
-		 * @author Carcohcal
-		 * */
+		/* @author Carcohcal
+		   */
 		calendarService.setHorario(schedule);
 		try {
 			calendarService.creaCalendario();
 		} catch (IOException | GeneralSecurityException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ParserException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (CalDAV4JException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

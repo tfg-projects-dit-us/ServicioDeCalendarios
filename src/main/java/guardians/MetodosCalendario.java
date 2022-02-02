@@ -33,7 +33,11 @@ import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.validate.ValidationException;
-
+/**
+ * 
+ * @author carcohcal
+ *
+ */
 @Service
 @Slf4j
 public class MetodosCalendario {
@@ -125,7 +129,7 @@ public class MetodosCalendario {
 			
 			 calendario = builder.build(stream);
 		}
-		
+		log.info("Calendario recuperado");
 		return calendario;
 	}
 	/**

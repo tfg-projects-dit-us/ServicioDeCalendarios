@@ -319,8 +319,7 @@ public class DoctorController {
 	 * {@link Doctor} id will be returned. 
 	 * 
 	 * @param email An email used to query for a {@link Doctor}
-	 * 
-	 * 
+	 *  
 	 * @return The doctor's id
 	 * @author carcohcal
 	 * 
@@ -349,8 +348,7 @@ public class DoctorController {
 	 * {@link Doctor} telegram id will be returned. 
 	 * 
 	 * @param id An the id used to query for a {@link Doctor}
-	 * 
-	 * 
+	 *  
 	 * @return The doctor's telegram id
 	 * @author carcohcal
 	 * 
