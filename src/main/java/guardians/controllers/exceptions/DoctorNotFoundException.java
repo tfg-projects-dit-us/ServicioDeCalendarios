@@ -27,4 +27,6 @@ public class DoctorNotFoundException extends NotFoundException {
 	public DoctorNotFoundException(String email) {
 		super("Could not fing a doctor with email: " + email);
 	}
+	
+	
 }

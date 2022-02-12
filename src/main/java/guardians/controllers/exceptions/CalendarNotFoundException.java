@@ -7,9 +7,8 @@ import guardians.model.entities.Calendar;
 /**
  * This exception will be thrown whenever a requested {@link Calendar} is not
  * found in the database
- * 
  * @author miggoncan
- * @version 2 by carcohcal 
+ * @version 2.0 by carcohcal 
  */
 public class CalendarNotFoundException extends NotFoundException {
 	private static final long serialVersionUID = -3853849068364093370L;

@@ -5,6 +5,9 @@ import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
+
 import org.apache.http.client.ClientProtocolException;
 import org.mnode.ical4j.serializer.JCalMapper;
 import org.mnode.ical4j.serializer.JCalSerializer;
@@ -27,12 +30,14 @@ import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.ConstraintViolationException;
+import net.fortuna.ical4j.validate.ValidationException;
 
 
 /**
- * The EventController will handle all requests related to  events
- * 
+ *  Controlador que maneja las peticiones relacionadas con un evento (@see VEvent)
  * @author carcohcal
+ * @date 12 feb. 2022
+ * @version 1.0
  */
 @RestController
 @RequestMapping("/event")
@@ -42,22 +47,26 @@ public class EventControlles {
 	
 	@Autowired
 	private calendarioGeneral servicioCalendario;
-	/**
+/**
  * 
- * @param yearMonth
- * @param json
- * @return 
+ * @author carcohcal
+ * @date 12 feb. 2022
+ * @param eventos evento o conjuntos de eventos en formato ical. Deben estar incluidos en un calendario (@see Calendar) 
+ * @return devuelve un mensaje informativo
  * @throws ClientProtocolException
  * @throws IOException
  * @throws ParserException
  * @throws CalDAV4JException
  * @throws ConstraintViolationException
- * @throws URISyntaxException 
- * @throws EventNotFoundException 
-	 * @throws ParseException 
+ * @throws URISyntaxException
+ * @throws EventNotFoundException
+ * @throws ParseException
+ * @throws AddressException
+ * @throws ValidationException
+ * @throws MessagingException
  */
 	@PostMapping("/update")
-	public String updateEvent(@RequestBody String eventos	) throws ClientProtocolException, IOException, ParserException, CalDAV4JException, ConstraintViolationException, URISyntaxException, EventNotFoundException, ParseException {
+	public String updateEvent(@RequestBody String eventos	) throws ClientProtocolException, IOException, ParserException, CalDAV4JException, ConstraintViolationException, URISyntaxException, EventNotFoundException, ParseException, AddressException, ValidationException, MessagingException {
 		log.info("Método PUT evento");
 		
 		Calendar calendario = StringaCal(eventos);

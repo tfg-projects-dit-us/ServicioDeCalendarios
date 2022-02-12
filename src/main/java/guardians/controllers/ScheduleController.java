@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.mail.MessagingException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
@@ -52,6 +53,7 @@ import guardians.model.repositories.ScheduleRepository;
 import guardians.services.calendarioGeneral;
 import lombok.extern.slf4j.Slf4j;
 import net.fortuna.ical4j.data.ParserException;
+import net.fortuna.ical4j.validate.ValidationException;
 
 // TODO Create integration test for ScheduleController
 
@@ -305,20 +307,14 @@ public class ScheduleController {
 		Schedule savedSchedule = scheduleRepository.save(schedule);
 		/* @author Carcohcal
 		   */
-		calendarService.setHorario(schedule);
 		try {
-			calendarService.creaCalendario();
-		} catch (IOException | GeneralSecurityException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		} catch (ParserException e) {
-			e.printStackTrace();
-		} catch (CalDAV4JException e) {
+			calendarService.setHorario(schedule);
+		} catch (ValidationException | IOException | GeneralSecurityException | InterruptedException
+				| URISyntaxException | ParserException | CalDAV4JException | MessagingException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 		
 		
 		log.info("The persited schedule is: " + savedSchedule);

@@ -26,19 +26,23 @@ import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * Esta clase gestiona el envío por email de los archivos
- * 
+ * Esta clase se encarga de enviar los calendarios individuales a los {@link Doctor} 
  * @author carcohcal
+ * @date 12 feb. 2022
+ * @version 1.0
+ * @param username usuario del servicio de email
  */
 @Slf4j
 @Service
 public class EmailService
 {
-
+	
 	@Value("${email.loggin}")
 	private  String username;
 	@Value("${email.password}")
 	private  String password;
+	
+	
 	@Value("${email.host}")
 	 private  String host;
 	@Value("${email.asunto}")
@@ -61,11 +65,18 @@ public class EmailService
 		log.info("Configuracion servicio email completad");
 	}
 	
-	/** Método que envía los emails de forma asíncrona 
+	/**
+	 * Método que envía los emails de forma asíncrona 
+	 * Este email incluye como archivo adjunto el {@link CalendariosIndivuales} de cada {@link Doctor}
+	 * @author carcohcal
+	 * @date 12 feb. 2022
 	 * @param emailTo direccion de email del destinatario
-	 * @param nombre del fichero a enviar como archivo adjunto */
+	 * @param nomFich nombre del fichero a enviar como archivo adjunto
+	 * @throws MessagingException 
+	 * @throws AddressException 
+	 */
 	@Async
- public void enviarEmail(String emailTo, String nomFich){
+ public void enviarEmail(String emailTo, String nomFich) throws AddressException, MessagingException{
 		setProperties();
 	  session = Session.getInstance(properties, new Authenticator() {
 		    @Override
@@ -73,7 +84,7 @@ public class EmailService
 		        return new PasswordAuthentication(username, password);
 		    }
 		});
-	try {  
+	
 	 
 		Message message = new MimeMessage(session);
 		message.setFrom(new InternetAddress(username));
@@ -104,14 +115,7 @@ public class EmailService
 	    
 	  log.info("Email enviado a: "+emailTo);
 	  eliminaFichero(nomFich);
-	  } catch (AddressException e)
-	{
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	} catch (MessagingException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
+	
    }
 	public String getAsunto() {
 		return asunto;

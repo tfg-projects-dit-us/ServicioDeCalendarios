@@ -36,6 +36,7 @@ import guardians.controllers.exceptions.DoctorNotFoundException;
 import guardians.controllers.exceptions.InvalidAbsenceException;
 import guardians.controllers.exceptions.InvalidDoctorException;
 import guardians.controllers.exceptions.InvalidEntityException;
+import guardians.controllers.exceptions.TelegramIDNotFoundException;
 import guardians.model.dtos.general.DoctorPublicDTO;
 import guardians.model.entities.Absence;
 import guardians.model.entities.Doctor;
@@ -50,6 +51,7 @@ import lombok.extern.slf4j.Slf4j;
  * themselves, but not their {@link ShiftConfiguration}
  * 
  * @author miggoncan
+ * @version 2.0 by carcohcal
  */
 @Slf4j
 @RestController
@@ -315,20 +317,14 @@ public class DoctorController {
 	}
 	
 	/**
-	 * Handle requests for the id of existing {@link Doctor} in the database. Only the
-	 * {@link Doctor} id will be returned. 
-	 * 
-	 * @param email An email used to query for a {@link Doctor}
-	 *  
-	 * @return The doctor's id
+	 *  Método que devuelve el  id del {@link Doctor} a través de su email
 	 * @author carcohcal
-	 * 
-	 * @throws DoctorNotFoundException if the given email is not used by any
-	 *                                 {@link Doctor}
+	 * @date 12 feb. 2022
+	 * @param email
+	 * @return el id del doctor
 	 */
-	@GetMapping("/drID")
-	public Long getID(
-			@RequestParam(required = true) String email) {
+	@GetMapping("/idDoctor")
+	public Long getID(	@RequestParam(required = true) String email) {
 		
 		Optional<Doctor> doctor = null;
 		
@@ -344,50 +340,39 @@ public class DoctorController {
 		return doctor.get().getId();
 	}
 	/**
-	 * Handle requests for the telegram id of existing {@link Doctor} in the database. Only the
-	 * {@link Doctor} telegram id will be returned. 
-	 * 
-	 * @param id An the id used to query for a {@link Doctor}
-	 *  
-	 * @return The doctor's telegram id
+	 * Método que devuelde el id de Telegram a través del id identificativo del {@link Doctor}. Estos ids son distintos. 
 	 * @author carcohcal
-	 * 
-	 * @throws DoctorNotFoundException if the given email is not used by any
-	 *                                 {@link Doctor}
+	 * @date 12 feb. 2022
+	 * @param id
+	 * @return devuelve el id de Telegram del {@link Doctor},  que es una cadena alfanumérica. 
 	 */
 	@GetMapping("/telegramID")
-	public String getTelegramID(
-			@RequestParam(required = true) Long id) {
+	public String getTelegramID(@RequestParam(required = true) Long id) {
 		
 		Optional<Doctor> doctor = null;
 		
+		log.info("Request received: return the doctor with id: " + id);
+		doctor = doctorRepository.findById(id);
+		if (!doctor.isPresent()){
+			log.info("The email could not be found. Thorwing DoctorNotFoundException");
+			throw new DoctorNotFoundException(id);
 			
-			log.info("Request received: return the doctor with id: " + id);
-			doctor = doctorRepository.findById(id);
-			if (!doctor.isPresent()){
-				log.info("The email could not be found. Thorwing DoctorNotFoundException");
-				throw new DoctorNotFoundException(id);
-				
-			}
+		}
 			
-		 
-		
-
-		return doctor.get().getTelegramId();
+		String telegramID = doctor.get().getTelegramId();
+		if (telegramID == null) {
+			throw new TelegramIDNotFoundException(id);
+		}
+		return telegramID ;
 	}
 	
 	/**
-	 * Handle requests to update the telegram id of existing {@link Doctor} in the database. Only the
-	 * {@link Doctor} telegram id will be returned. 
-	 * 
-	 * @param telegramID the telegram id of the {@link Doctor} to update
-	 * 
-	 * @param doctorId of the doctor 
-	 * @return true if the operation is successful or false otherwise 
+	 * Método para modificar el id de Telegram a través del id identificativo del {@link Doctor}. Estos ids son distintos. 
 	 * @author carcohcal
-	 * 
-	 * @throws DoctorNotFoundException if the given email is not used by any
-	 *                                 {@link Doctor}
+	 * @date 12 feb. 2022
+	 * @param doctorId
+	 * @param telegramID id de Telegram del 
+	 * @return
 	 */
 	@PutMapping("/telegramID/{doctorId}")
 	public String addTelID(@PathVariable("doctorId") Long doctorId,

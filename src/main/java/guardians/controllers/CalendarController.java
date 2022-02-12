@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,12 +33,11 @@ import guardians.controllers.exceptions.CalendarAlreadyExistsException;
 import guardians.controllers.exceptions.CalendarNotFoundException;
 import guardians.controllers.exceptions.InvalidCalendarException;
 import guardians.controllers.exceptions.InvalidDayConfigurationException;
-import guardians.controllers.exceptions.ScheduleNotFoundException;
 import guardians.model.dtos.general.CalendarPublicDTO;
 import guardians.model.dtos.general.CalendarSummaryPublicDTO;
 import guardians.model.entities.Calendar;
 import guardians.model.entities.DayConfiguration;
-import guardians.model.entities.Schedule;
+import guardians.model.entities.Doctor;
 import guardians.model.entities.primarykeys.CalendarPK;
 import guardians.model.repositories.CalendarRepository;
 import guardians.services.CalDav;
@@ -48,6 +50,7 @@ import net.fortuna.ical4j.data.ParserException;
  * The CalendarController will handle all requests related to {@link Calendar}
  * 
  * @author miggoncan
+ * @version 2.0 by carcohcal
  */
 @RestController
 @RequestMapping("/calendars")
@@ -195,22 +198,21 @@ public class CalendarController {
 	}
 	
 	
-	/**
-	 * This method handles GET requests of a specific {@link Schedule}
-	 * @author carcohcal
-	 * @param yearMonth The year and month of this schedule. E.g. 2020-06
-	 * @param email the email of the doctor which calendar it's needed
-	 * @return The found {@link Schedule}
-	 * @throws URISyntaxException 
-	 * @throws IOException 
-	 * @throws CalDAV4JException 
-	 * @throws ParserException 
-	 * @throws ScheduleNotFoundException if the {@link Schedule} has not been
-	 *                                   generated yet
-	 */
+/**Este método recupera el calendario individual en formato ical {@linkplain net.fortuna.ical4j.model.Calendar} de cada {@link Doctor} para un mes concreto a través de su email
+ * @author carcohcal
+ * @param email email del {@link Doctor} para el que se quiere recuperar el calendario
+ * @param yearMonth mes y año del calendario a recuperar
+ * @return mensaje de texto confirmando que se ha completado la acción
+ * @throws IOException
+ * @throws URISyntaxException
+ * @throws ParserException
+ * @throws CalDAV4JException
+ * @throws MessagingException 
+ * @throws AddressException 
+ */
 	@ResponseBody
-	@GetMapping("/individual/{yearMonth}")
-	public String getCalendario(@PathVariable YearMonth yearMonth,@RequestBody String email) throws IOException, URISyntaxException, ParserException, CalDAV4JException {
+	@GetMapping("/")
+	public String getCalendarioIndividual(@RequestParam String email,@RequestParam YearMonth yearMonth ) throws IOException, URISyntaxException, ParserException, CalDAV4JException, AddressException, MessagingException {
 		log.info("Request received: get schedule of " + yearMonth);
 		
 		servidorCalendario.recuperarCalendario(yearMonth,email);

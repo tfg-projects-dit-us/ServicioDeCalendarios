@@ -1,6 +1,7 @@
 package guardians.services;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.YearMonth;
@@ -8,6 +9,10 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.function.Predicate;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
+
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -16,40 +21,46 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.github.caldav4j.exceptions.CalDAV4JException;
 import com.github.caldav4j.methods.CalDAV4JMethodFactory;
+import com.github.caldav4j.methods.HttpGetMethod;
 import com.github.caldav4j.methods.HttpPutMethod;
 import com.github.caldav4j.model.request.CalendarRequest;
 
-import guardians.MetodosCalendario;
 import guardians.controllers.exceptions.CalendarNotFoundException;
-import guardians.controllers.exceptions.DoctorNotFoundException;
-import guardians.controllers.exceptions.EventNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.filter.Filter;
 import net.fortuna.ical4j.filter.predicate.PeriodRule;
 import net.fortuna.ical4j.filter.predicate.PropertyEqualToRule;
-import net.fortuna.ical4j.filter.predicate.PropertyExistsRule;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
-import net.fortuna.ical4j.model.ConstraintViolationException;
+import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.PropertyList;
+import net.fortuna.ical4j.model.TimeZoneRegistry;
+import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 import net.fortuna.ical4j.model.component.CalendarComponent;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.property.Attendee;
-import net.fortuna.ical4j.model.property.Uid;
+import net.fortuna.ical4j.model.property.CalScale;
+import net.fortuna.ical4j.model.property.ProdId;
+import net.fortuna.ical4j.model.property.Version;
 
 /**
- * Esta clase se encarga de interactuar con el servidor CalDAV 
- * 
+ * Esta clase se encarga de interactuar con el servidor CalDAV a través de la URI del servidor.
+ * Este servidor está protegido por usuario y contraseña.
  * @author carcohcal
+ * @date 12 feb. 2022
+ * @version 1.0
  */
 @SuppressWarnings("deprecation")
 @Slf4j
@@ -62,16 +73,14 @@ public class CalDav {
 	@Value("${calendario.uri}")
 	private String uri;
 	@Autowired
-	private EmailService emailController;
-	@Autowired
-	private MetodosCalendario metodos;
-	
-
+	private EmailService servicioEmail;
 	/**
-	 *  Este método se encarga de publicar el calendario en el servidor
-	 * @param calendar
-	 * @throws IOException 
-	 * @throws ClientProtocolException 
+	 * Método que se encarga de publicar el calendario @see Calendar generado del mes en el servidor de calendario
+	 * @author carcohcal
+	 * @date 12 feb. 2022
+	 * @param calendar calendario generado con la planificación del mes @see Calendar 
+	 * @throws ClientProtocolException
+	 * @throws IOException
 	 */
 public void publicarCalendario(Calendar calendar) throws ClientProtocolException, IOException {
 
@@ -97,31 +106,35 @@ public void publicarCalendario(Calendar calendar) throws ClientProtocolException
 }
 
 /**
- *  Este método permite recuperar el calendario de un doctor para un mes concreto através de su email
+ * Este método contiene la lógica que permite recuperar el calendario ( @see Calendar) de un {@link  guardians.model.entities.Doctor} para un mes concreto através de su email
+ * @author carcohcal
+ * @date 12 feb. 2022
  * @param mesAnio
  * @param email
- * @throws IOException 
- * @throws URISyntaxException 
- * @throws CalDAV4JException 
- * @throws ParserException 
+ * @throws IOException
+ * @throws URISyntaxException
+ * @throws ParserException
+ * @throws CalDAV4JException
+ * @throws AddressException
+ * @throws MessagingException
  */
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public void recuperarCalendario(YearMonth mesAnio, String email) throws IOException, URISyntaxException, ParserException, CalDAV4JException {
+public void recuperarCalendario(YearMonth mesAnio, String email) throws IOException, URISyntaxException, ParserException, CalDAV4JException, AddressException, MessagingException {
 
 
 	
 	// Retrieve the Calendar from the response.
-	Calendar calendar = metodos.getCalendario();
+	Calendar calendar = getCalendarioServer();
 	
 	
 	log.info("Fecha: "+mesAnio);
 	DateTime start = new DateTime();
-	start.setTime(metodos.fecha(mesAnio.getYear(), mesAnio.getMonthValue(), 1).getTime());
+	start.setTime(conviertefecha(mesAnio.getYear(), mesAnio.getMonthValue(), 1).getTime());
 	YearMonth yearMonthObject = YearMonth.of(mesAnio.getYear(), mesAnio.getMonthValue());
 	int daysInMonth = yearMonthObject.lengthOfMonth();
 	DateTime duration=  new DateTime();
-	duration.setTime(metodos.fecha(mesAnio.getYear(), mesAnio.getMonthValue(), daysInMonth+1).getTime());
+	duration.setTime(conviertefecha(mesAnio.getYear(), mesAnio.getMonthValue(), daysInMonth+1).getTime());
 	net.fortuna.ical4j.model.Period period = new net.fortuna.ical4j.model.Period(start,  duration);
 	Filter filter = new Filter(new PeriodRule(period));
 	Collection eventsToday = filter.filter(calendar.getComponents(Component.VEVENT));
@@ -149,12 +162,12 @@ public void recuperarCalendario(YearMonth mesAnio, String email) throws IOExcept
 			}
 			calendarioDoctor.getComponents().add(evento );
 		}
-		metodos.generaFichero(calendarioDoctor, nomFich);
+		generaFichero.generarFichero(calendarioDoctor, nomFich);
 		
 		log.info("Fichero creado con nombre "+nomFich);
 		
 		//Se envia por email el calendario individual
-		emailController.enviarEmail(email, nomFich);
+		servicioEmail.enviarEmail(email, nomFich);
 		
 	}else {
 		log.info("No hay eventos para ese doctor. Thorwing EventNotFoundException");
@@ -163,4 +176,83 @@ public void recuperarCalendario(YearMonth mesAnio, String email) throws IOExcept
 	
 }
 
+/**
+ * Método que recupera el calendario del servidor através de la URI
+ * @author carcohcal
+ * @date 12 feb. 2022
+ * @return
+ * @throws ClientProtocolException
+ * @throws IOException
+ * @throws ParserException
+ */
+public Calendar  getCalendarioServer () throws ClientProtocolException, IOException, ParserException {
+	CalDAV4JMethodFactory factory = new CalDAV4JMethodFactory();
+	HttpGetMethod method = factory.createGetMethod(uri);
+	
+	CredentialsProvider provider = new BasicCredentialsProvider();
+	provider.setCredentials(
+	        AuthScope.ANY,
+	        new UsernamePasswordCredentials(username, password)
+	);
+	
+	HttpClient client = HttpClientBuilder.create()
+	.setDefaultCredentialsProvider(provider)
+	.disableAuthCaching()
+	.build();
+
+	log.info("Cliente HTTP creado: "+client);
+	
+	// Execute the method.
+	HttpResponse response = client.execute(method);
+	Calendar calendario = null;
+	if (response.getStatusLine().getStatusCode() == 404)
+	{
+		calendario = new Calendar();
+		calendario.getProperties().add(new ProdId("-//Calendario Guardias//"));
+		calendario.getProperties().add(Version.VERSION_2_0);
+		calendario.getProperties().add(CalScale.GREGORIAN);
+		
+		TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
+
+		
+		VTimeZone tz = registry.getTimeZone("Europe/Madrid").getVTimeZone();
+		calendario.getComponents().add(tz);
+
+
+	}else {
+		// Retrieve the Calendar from the response.
+
+		HttpEntity entity = response.getEntity();
+		
+		
+		// Read the contents of an entity and return it as a String.
+		String content = EntityUtils.toString(entity);
+		
+		
+		StringReader stream = new StringReader(content) ;
+		
+		CalendarBuilder builder = new CalendarBuilder();
+		
+		 calendario = builder.build(stream);
+	}
+	log.info("Calendario recuperado");
+	return calendario;
+}
+
+
+/**
+ * metodo que devuelve la fecha en formato Date
+ * @author carcohcal
+ * @param anio
+ * @param mes
+ * @param numDia
+ * @return
+ */
+public Date conviertefecha (Integer anio, Integer mes, Integer numDia)
+{
+	java.util.Calendar calendar = java.util.Calendar.getInstance();
+	calendar.set(anio, mes-1, numDia);
+	
+	return new Date(calendar.getTime());
+}
 }

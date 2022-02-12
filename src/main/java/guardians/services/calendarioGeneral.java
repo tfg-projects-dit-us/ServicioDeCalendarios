@@ -13,6 +13,9 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.function.Predicate;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
+
 import org.apache.http.client.ClientProtocolException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +23,6 @@ import org.springframework.stereotype.Service;
 
 import com.github.caldav4j.exceptions.CalDAV4JException;
 
-import guardians.MetodosCalendario;
 import guardians.controllers.exceptions.DoctorNotFoundException;
 import guardians.controllers.exceptions.EventNotFoundException;
 import guardians.model.entities.Doctor;
@@ -43,7 +45,13 @@ import net.fortuna.ical4j.model.parameter.CuType;
 import net.fortuna.ical4j.model.property.Attendee;
 import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Uid;
-
+import net.fortuna.ical4j.validate.ValidationException;
+/**
+ *  Clase que continee los métodos del calendario general del servicio
+ * @author carcohcal
+ * @date 12 feb. 2022
+ * @version 1.0
+ */
 @SuppressWarnings("deprecation")
 @Service
 @Slf4j
@@ -61,7 +69,7 @@ public class calendarioGeneral {
 	private Integer anio;
 	private Integer mes;
 	@Autowired
-	private CalendariosIndivuales calIndiv;
+	private CalendariosIndividuales calIndiv;
 	@Autowired 
 	private CalDav caldav;
 	@Autowired
@@ -77,36 +85,53 @@ public class calendarioGeneral {
 
 
 	private HashMap<String, String> ids= new HashMap<String, String>();
-	@Autowired
-	private MetodosCalendario metodos;
-
-	public void setHorario(Schedule schedule) {
+	/**
+	 *  Valor del Schedule para el qeu se va a generar el calendario
+	 * @author carcohcal
+	 * @date 12 feb. 2022
+	 * @param schedule
+	 * @throws MessagingException 
+	 * @throws CalDAV4JException 
+	 * @throws ParserException 
+	 * @throws URISyntaxException 
+	 * @throws InterruptedException 
+	 * @throws GeneralSecurityException 
+	 * @throws IOException 
+	 * @throws ValidationException 
+	 * @throws AddressException 
+	 */
+	public void setHorario(Schedule schedule) throws AddressException, ValidationException, IOException, GeneralSecurityException, InterruptedException, URISyntaxException, ParserException, CalDAV4JException, MessagingException {
 		this.horario = schedule;
+		creaCalendario();
 	}
 
    
-  /**
-   * Construye el objeto calendario
-   * @throws IOException
-   * @throws GeneralSecurityException
-   * @throws InterruptedException
-   * @throws URISyntaxException
-   * @throws ParserException
-   * @throws CalDAV4JException
-   */
-public void creaCalendario() throws IOException, GeneralSecurityException, InterruptedException, URISyntaxException, ParserException, CalDAV4JException {
+/**
+ * Constyruye el objeto calendario {@link Calendar} del objeto Schedule pasado por {@link calendarioGeneral#setHorario(Schedule) setHorario}
+ * @author carcohcal
+ * @date 12 feb. 2022
+ * @throws IOException
+ * @throws GeneralSecurityException
+ * @throws InterruptedException
+ * @throws URISyntaxException
+ * @throws ParserException
+ * @throws CalDAV4JException
+ * @throws AddressException
+ * @throws ValidationException
+ * @throws MessagingException
+ */
+private void creaCalendario() throws IOException, GeneralSecurityException, InterruptedException, URISyntaxException, ParserException, CalDAV4JException, AddressException, ValidationException, MessagingException {
     
 	ids.put(cycle, "jc");
 	ids.put(shifts,"ca");
 	ids.put(consultation, "c");
     	
-	Calendar calendario = metodos.getCalendario();
+	Calendar calendario = caldav.getCalendarioServer();
 	        
     mes = horario.getMonth(); 
     anio = horario.getYear();
     log.info("Calendario creado para: " +mes+anio);      
     
-    calIndiv.setFecha(mes, anio);
        
     SortedSet<ScheduleDay> dias = horario.getDays();
     Iterator<ScheduleDay> iterator = dias.iterator();
@@ -132,28 +157,34 @@ public void creaCalendario() throws IOException, GeneralSecurityException, Inter
 			}
         
        calIndiv.enviaCalendarios();
-       metodos.generaFichero(calendario,getNombreFichero());
+       generaFichero.generarFichero(calendario,getNombreFichero());
        caldav.publicarCalendario(calendario);
        
     }
 
 
-
-	private VEvent creaEvento(Integer numDia, String summary, Set<Doctor> doctores) throws URISyntaxException {
-		 
-       
-        
+/**
+ *  Método que conffigura el evento (VEvent) con los parámtros prporcionados
+ * @author carcohcal
+ * @date 12 feb. 2022
+ * @param numDia día del mes en el que ocurrirá el evento
+ * @param summary descripción {@link net.fortuna.ical4j.model.property.Summary}  del evento, en este caso tipo de turno
+ * @param doctores {@link Doctor} que participará en el turno
+ * @return evento generado (VEvent) 
+ * @throws URISyntaxException
+ */
+	private VEvent creaEvento(Integer numDia, String summary, Set<Doctor> doctores) throws URISyntaxException {  
        
         Iterator<Doctor> iterator = doctores.iterator();
         
      	//Evento Individual, necesario para que no haya corrupción de datos
      	   	
-         VEvent event=new VEvent( metodos.fecha(anio, mes, numDia),summary);
+         VEvent event=new VEvent( caldav.conviertefecha(anio, mes, numDia),summary);
          String ID = numDia.toString()+mes.toString()+anio.toString()+ ids.get(summary);
          Uid   uid = new Uid(ID);
          event.getProperties().add(uid);
             
-         VEvent event_indi = new VEvent( metodos.fecha(anio, mes, numDia),summary);
+         VEvent event_indi = new VEvent( caldav.conviertefecha(anio, mes, numDia),summary);
          event_indi.getProperties().add(uid);
 		while(iterator.hasNext()) {
 				Doctor doctor = iterator.next();
@@ -170,20 +201,25 @@ public void creaCalendario() throws IOException, GeneralSecurityException, Inter
 	}
 
 	/**
-	 * 
+	 *  Método que contiene la lógica para modifcar el calendario generado en {@link calendarioGeneral#creaCalendario()}
+	 * @author carcohcal
+	 * @date 12 feb. 2022
 	 * @param eventosModificado
-	 * @return
+	 * @return devuelve un mensaje de texto informativo
 	 * @throws ClientProtocolException
 	 * @throws IOException
 	 * @throws ParserException
 	 * @throws URISyntaxException
 	 * @throws EventNotFoundException
-	 * @throws ParseException 
+	 * @throws ParseException
+	 * @throws AddressException
+	 * @throws ValidationException
+	 * @throws MessagingException
 	 */
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public String modficarCalendario(Calendar eventosModificado) throws ClientProtocolException, IOException, ParserException, URISyntaxException, EventNotFoundException, ParseException {
-		Calendar calendarOriginal = metodos.getCalendario();
+	public String modficarCalendario(Calendar eventosModificado) throws ClientProtocolException, IOException, ParserException, URISyntaxException, EventNotFoundException, ParseException, AddressException, ValidationException, MessagingException {
+		Calendar calendarOriginal = caldav.getCalendarioServer();
 		
 		Calendar calendarioModif = eventosModificado;  
 		String mensaje = "Calendario actualizado";
@@ -219,7 +255,7 @@ public void creaCalendario() throws IOException, GeneralSecurityException, Inter
 			
 			//Añadimos los doctores nuevos
 			PropertyList<Property> nuevos= comparaDoctor(dr_nuevos,dr_originales);
-			eventoIndividual(setEvento(eventOri),nuevos ,false);
+			addEventoIndividual(setEvento(eventOri),nuevos ,false);
 			Iterator  iterador = nuevos.iterator();	
 			while(iterador.hasNext()) {
 				eventOri.getProperties().add((Attendee)iterador.next());	
@@ -228,17 +264,13 @@ public void creaCalendario() throws IOException, GeneralSecurityException, Inter
 			
 			//Eliminamos los doctores antiguos
 			PropertyList<Property> antiguos = comparaDoctor(dr_originales, dr_nuevos);
-			eventoIndividual(setEvento(eventOri),antiguos ,true);
+			addEventoIndividual(setEvento(eventOri),antiguos ,true);
 			Iterator<Property> iterator = antiguos.iterator();
 			while(iterator.hasNext()) {
 				eventOri.getProperties().remove((Attendee)iterator.next());
 			}
 								
-			calendarOriginal.getComponents().add(eventOri);	
-			
-			
-			
-			
+			calendarOriginal.getComponents().add(eventOri);			
 	   }
 	   caldav.publicarCalendario(calendarOriginal);
 	   calIndiv.enviaCalendarios();
@@ -246,6 +278,17 @@ public void creaCalendario() throws IOException, GeneralSecurityException, Inter
 	   
 	}
 	
+	/**
+	 * Compara dos listas de doctores
+	 * @author carcohcal
+	 * @date 12 feb. 2022
+	 * @param doctoresLista
+	 * @param docotoresEliminar
+	 * @return devuelve los doctores que no se encuentrán en ambas listas
+	 * @throws ParseException
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 */
 	private PropertyList<Property> comparaDoctor(PropertyList<Property> doctoresLista, PropertyList<Property> docotoresEliminar) throws ParseException, IOException, URISyntaxException {
 		
 		PropertyList<Property> doctores= new PropertyList<Property> (doctoresLista);
@@ -255,7 +298,9 @@ public void creaCalendario() throws IOException, GeneralSecurityException, Inter
 	}
 	
 	/**
-	 * 
+	 * Comprueba si los {@link Doctor} existen en la base de datos
+	 * @author carcohcal
+	 * @date 12 feb. 2022
 	 * @param doctores
 	 */
 	private void comprobarDoctores(PropertyList<Property> doctores) {
@@ -275,9 +320,11 @@ public void creaCalendario() throws IOException, GeneralSecurityException, Inter
 	}
 	
 	/**
-	 * 
+	 * Extrae un evento de una Collection<CalendarComponent>
+	 * @author carcohcal
+	 * @date 12 feb. 2022
 	 * @param eventosDoctor
-	 * @return
+	 * @return evento VEvent
 	 */
 	private VEvent getEvento( Collection<CalendarComponent> eventosDoctor) {
 		
@@ -289,8 +336,15 @@ public void creaCalendario() throws IOException, GeneralSecurityException, Inter
 		}
 		return evento;
 	}
-	
-	private void eventoIndividual(VEvent evento,PropertyList<Property> doctores ,boolean cancel) {
+	/**
+	 * Añade los eventos individuales a los calendarios individuale sgestionados en {@link CalendariosIndividuales}
+	 * @author carcohcal
+	 * @date 12 feb. 2022
+	 * @param evento
+	 * @param doctores
+	 * @param cancel
+	 */
+	private void addEventoIndividual(VEvent evento,PropertyList<Property> doctores ,boolean cancel) {
 		
 		if (cancel)
 		{
@@ -302,6 +356,13 @@ public void creaCalendario() throws IOException, GeneralSecurityException, Inter
 		}
 		
 	}
+	/**
+	 * Método auxiliar que devuelve un evento nuevo creado con los mismo parámetros que el argumento
+	 * @author carcohcal
+	 * @date 12 feb. 2022
+	 * @param event VEvent evento que se desea clonar
+	 * @return evento VEvent clonado
+	 */
 	
 	private VEvent setEvento(VEvent event) {
 		VEvent eventInd = new VEvent();
