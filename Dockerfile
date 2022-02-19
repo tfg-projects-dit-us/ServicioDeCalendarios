@@ -4,7 +4,7 @@ RUN apt install software-properties-common -y && add-apt-repository ppa:deadsnak
 RUN apt install python3.7 -y
 RUN apt-get -y install python3-pip
 RUN apt-get install git -y
-RUN git clone https://github.com/carcohcal/guardiansScheduler.git
+RUN git clone https://github.com/tfg-projects-dit-us/guardiansScheduler.git
 WORKDIR /guardiansScheduler
 RUN python3.7 -m pip install -r requirements.txt
 WORKDIR /guardiansScheduler/src

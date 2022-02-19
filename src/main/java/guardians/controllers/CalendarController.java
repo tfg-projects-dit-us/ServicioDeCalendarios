@@ -33,6 +33,7 @@ import guardians.controllers.exceptions.CalendarAlreadyExistsException;
 import guardians.controllers.exceptions.CalendarNotFoundException;
 import guardians.controllers.exceptions.InvalidCalendarException;
 import guardians.controllers.exceptions.InvalidDayConfigurationException;
+import guardians.controllers.service.CalDav;
 import guardians.model.dtos.general.CalendarPublicDTO;
 import guardians.model.dtos.general.CalendarSummaryPublicDTO;
 import guardians.model.entities.Calendar;
@@ -40,7 +41,6 @@ import guardians.model.entities.DayConfiguration;
 import guardians.model.entities.Doctor;
 import guardians.model.entities.primarykeys.CalendarPK;
 import guardians.model.repositories.CalendarRepository;
-import guardians.services.CalDav;
 import lombok.extern.slf4j.Slf4j;
 import net.fortuna.ical4j.data.ParserException;
 

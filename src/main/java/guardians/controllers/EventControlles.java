@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.caldav4j.exceptions.CalDAV4JException;
 
 import guardians.controllers.exceptions.EventNotFoundException;
-import guardians.services.calendarioGeneral;
+import guardians.controllers.service.calendarioGeneral;
 import lombok.extern.slf4j.Slf4j;
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
