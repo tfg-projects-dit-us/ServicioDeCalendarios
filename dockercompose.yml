@@ -12,7 +12,7 @@ services:
     ports:
       - 3306:3306
   myapp-main:
-    image: serviciodecalendarios:prueba
+    image: carcohcal/serviciodecalendarios:prueba
     restart: on-failure
     depends_on:
       - myapp-mysql
