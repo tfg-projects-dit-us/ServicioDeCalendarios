@@ -24,8 +24,8 @@ public class DoctorNotFoundException extends NotFoundException {
 	/**
 	 * @param email An email that no {@link Doctor} has assigned
 	 */
-	public DoctorNotFoundException(String email) {
-		super("Could not fing a doctor with email: " + email);
+	public DoctorNotFoundException(String id) {
+		super("Could not fing a doctor with email/Telegram ID: " + id);
 	}
 	
 	

@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.validation.ConstraintViolation;
@@ -317,25 +318,32 @@ public class DoctorController {
 	}
 	
 	/**
-	 *  Método que devuelve el  id del {@link Doctor} a través de su email
+	 *  Método que devuelve el  id del {@link Doctor} a través de su email o ID de Telegram
 	 * @author carcohcal
 	 * @date 12 feb. 2022
 	 * @param email
+	 * @param idTel -> ID Telegram
 	 * @return el id del doctor
 	 */
 	@GetMapping("/idDoctor")
-	public Long getID(	@RequestParam(required = true) String email) {
+	public Long getID(	@RequestParam (required = false)String idTel,@RequestParam(required = false) String email ) {
 		
 		Optional<Doctor> doctor = null;
 		
-			
+		if (email!=null) {
 			log.info("Request received: return the doctor with emailT: " + email);
 			doctor = doctorRepository.findByEmail(email);
 			if (!doctor.isPresent()){
-				log.info("The email could not be found. Thorwing DoctorNotFoundException");
+				log.info("No doctor could be found. Thorwing DoctorNotFoundException");
 				throw new DoctorNotFoundException(email);
 				
-			}
+			}}else {
+				log.info("Request received: return the doctor with telegram id: " + idTel);
+				doctor = doctorRepository.findBytelegramId(idTel);
+				if (!doctor.isPresent()){
+					log.info("The doctor could not be found. Thorwing DoctorNotFoundException");
+					throw new DoctorNotFoundException(idTel);
+			}}
 
 		return doctor.get().getId();
 	}
@@ -366,6 +374,8 @@ public class DoctorController {
 		return telegramID ;
 	}
 	
+	
+	
 	/**
 	 * Método para modificar el id de Telegram a través del id identificativo del {@link Doctor}. Estos ids son distintos. 
 	 * @author carcohcal
@@ -395,7 +405,8 @@ public class DoctorController {
 				return res;
 		
 	}
-}
+	
+	}
 	
 
 
