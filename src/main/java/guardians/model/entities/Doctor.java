@@ -10,6 +10,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -52,6 +54,9 @@ public class Doctor {
 	@Column(nullable = false)
 	@NotBlank
 	private String lastNames;
+	
+	@OneToMany
+	private Rol rol;
 
 	@Email
 	@NotBlank
@@ -100,6 +105,13 @@ public class Doctor {
 		this.absence = absence;
 		if (absence != null) {
 			this.absence.setDoctor(this);
+		}
+	}
+	
+	public void setRol(Rol rol) {
+		this.rol = rol;
+		if (rol != null) {
+			this.rol.setDoctor(this);
 		}
 	}
 	
