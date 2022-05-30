@@ -43,7 +43,7 @@ import net.fortuna.ical4j.validate.ValidationException;
 @RequestMapping("/event")
 @Slf4j
 
-public class EventControlles {
+public class EventController {
 	
 	@Autowired
 	private calendarioGeneral servicioCalendario;
