@@ -27,4 +27,12 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
 	 * @return The {@link Doctor}, if found
 	 */
 	public Optional<Doctor> findByEmail(String email);
+	
+	/**Retrieve a {@link Doctor} from the database if it exists, provided its
+	 * Telegram ID
+	 * @author carcohcal
+	 * @param telegramId
+	 * @return
+	 */
+	public Optional<Doctor> findBytelegramId(String telegramId);
 }
