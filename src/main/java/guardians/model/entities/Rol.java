@@ -2,38 +2,47 @@ package guardians.model.entities;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.MapsId;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.validation.constraints.NotNull;
-
+import javax.persistence.Table;
 import lombok.Data;
 
 @Data
 @Entity
 public class Rol {
-
-	/**
-	 * doctor_id is the primary key of the {@link Doctor} with this Rol
-	 */
+	
+	
 	@Id
-	private Long doctorId;
+	  @GeneratedValue(strategy = GenerationType.IDENTITY)
+	  @Column(nullable = false)
+	private Long id;
 	
-	
-
-	@Column(nullable = false)
-	@NotNull
-	private String rol;
+	private String nombreRol;
 
 	
 	public Rol() {
 		
 	}
 	
+	public Rol(String rol) {
+		
+		this.nombreRol=rol;
+		
+	}
+	
 	@Override
 	public String toString() {
-		return Rol.class.getSimpleName() + "(" + "doctorId=" + this.doctorId + ", " + "manafer=" + this.rol+ ")";
+		return Rol.class.getSimpleName() + "("  + "Nombre rol=" + this.nombreRol+ ")";
+	}
+	
+	public String getNombreRol() {
+		return this.nombreRol;
+	}
+	
+	public void setNombreRol(String rol)
+	{
+		this.nombreRol=rol;
 	}
 	
 }

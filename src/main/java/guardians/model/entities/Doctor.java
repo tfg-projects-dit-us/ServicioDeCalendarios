@@ -1,17 +1,21 @@
 package guardians.model.entities;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -55,9 +59,6 @@ public class Doctor {
 	@NotBlank
 	private String lastNames;
 	
-	@OneToMany
-	private Rol rol;
-
 	@Email
 	@NotBlank
 	@Column(unique = true, nullable = false)
@@ -74,7 +75,15 @@ public class Doctor {
 	// shift cycle
 	@Column(nullable = false)
 	private LocalDate startDate;
-
+	
+	@ManyToMany( fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "doctor_roles",
+            joinColumns = @JoinColumn(name = "doctor_id"),
+            inverseJoinColumns = @JoinColumn(name = "rol_id")
+            )
+    private Set<Rol> roles = new HashSet<>();
+	
 	public Doctor(String firsName, String lastNames, String email, LocalDate startDate) {
 		this.firstName = firsName;
 		this.lastNames = lastNames;
@@ -108,12 +117,9 @@ public class Doctor {
 		}
 	}
 	
-	public void setRol(Rol rol) {
-		this.rol = rol;
-		if (rol != null) {
-			this.rol.setDoctor(this);
-		}
-	}
+	public void addRole(Rol role) {
+        this.roles.add(role);
+}
 	
 	public void setTelegramId(String telID) {
 		this.telegramId = telID;

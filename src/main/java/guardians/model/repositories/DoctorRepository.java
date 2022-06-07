@@ -1,10 +1,14 @@
 package guardians.model.repositories;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.Entity;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import guardians.model.entities.Doctor;
 
@@ -35,4 +39,13 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
 	 * @return
 	 */
 	public Optional<Doctor> findBytelegramId(String telegramId);
-}
+	
+	
+	
+	 @Query("SELECT u FROM Doctor u JOIN u.roles r WHERE r.nombreRol LIKE %?1%")
+	   public List<Doctor> findByRol(String keyword);
+	}
+	    
+	
+
+

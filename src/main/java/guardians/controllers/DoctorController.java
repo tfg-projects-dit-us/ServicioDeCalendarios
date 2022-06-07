@@ -37,14 +37,17 @@ import guardians.controllers.exceptions.DoctorNotFoundException;
 import guardians.controllers.exceptions.InvalidAbsenceException;
 import guardians.controllers.exceptions.InvalidDoctorException;
 import guardians.controllers.exceptions.InvalidEntityException;
+import guardians.controllers.exceptions.NotFoundException;
 import guardians.controllers.exceptions.TelegramIDNotFoundException;
 import guardians.model.dtos.general.DoctorPublicDTO;
 import guardians.model.entities.Absence;
 import guardians.model.entities.Doctor;
 import guardians.model.entities.ShiftConfiguration;
 import guardians.model.entities.Doctor.DoctorStatus;
+import guardians.model.entities.Rol;
 import guardians.model.repositories.AbsenceRepository;
 import guardians.model.repositories.DoctorRepository;
+import guardians.model.repositories.RolRepository;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -69,6 +72,9 @@ public class DoctorController {
 
 	@Autowired
 	private Validator validator;
+	
+	@Autowired
+	private RolRepository rolRepository;
 
 	/**
 	 * This method will return a valid {@link Doctor} given its
@@ -403,6 +409,52 @@ public class DoctorController {
 		} 
 		String res = "ID de telegram actualizado";
 				return res;
+		
+	}
+	
+
+	/**
+	 * Put rol
+	 * @param doctorId
+	 * @param rol
+	 * @return
+	 * @author carcohcal
+	 */
+	@PutMapping("/rol/{email}")
+	public String addRol(@PathVariable("email") String email,
+			@RequestBody String rol 	) {
+		
+		Optional<Doctor> doctor = null;
+				
+		log.info("Request received: return the doctor with id: " + email);
+		doctor = doctorRepository.findByEmail(email);
+		if (!doctor.isPresent()){
+			log.info("The doctor could not be found. Thorwing DoctorNotFoundException");
+			throw new DoctorNotFoundException(email);
+			
+		}else {
+			Optional<Rol> roleUser = rolRepository.findBynombreRol(rol);
+			if (roleUser.isPresent()) {
+			 doctor.get().addRole(roleUser.get());
+			
+			doctorRepository.save(doctor.get());}else throw new NotFoundException ("Rol "+ rol+" no encontrado");
+			
+		} 
+		String res = "Rol actualizado";
+				return res;
+		
+	}
+	
+	@GetMapping("/rol")
+	public String listDoctorByRol(@RequestParam(required = true) String rol) {
+		Optional<Rol> roleUser = rolRepository.findBynombreRol(rol);
+		List<Doctor> doctores =null;
+		if (roleUser.isPresent()) {
+			doctores = doctorRepository.findByRol(rol);
+			if(doctores.isEmpty()) throw new NotFoundException ("Ningún doctor con ese "+ rol+" encontrado");
+		}else throw new NotFoundException ("Rol "+ rol+" no encontrado");
+		
+		return doctores.toString();
 		
 	}
 	

@@ -3,6 +3,9 @@ package guardians;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -16,10 +19,12 @@ import guardians.model.entities.AllowedShift;
 import guardians.model.entities.Calendar;
 import guardians.model.entities.DayConfiguration;
 import guardians.model.entities.Doctor;
+import guardians.model.entities.Rol;
 import guardians.model.entities.ShiftConfiguration;
 import guardians.model.repositories.AllowedShiftRepository;
 import guardians.model.repositories.CalendarRepository;
 import guardians.model.repositories.DoctorRepository;
+import guardians.model.repositories.RolRepository;
 import guardians.model.repositories.ShiftConfigurationRepository;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,6 +39,8 @@ public class LoadInitialData {
 	private CalendarRepository calendarRepository;
 	@Autowired
 	private AllowedShiftRepository allowedShiftRepository;
+	@Autowired
+	private RolRepository rolRepository;
 
 	@Bean
 	CommandLineRunner preloadInitialData() {
@@ -41,7 +48,8 @@ public class LoadInitialData {
 			log.info("Starting the preload of the initial data");
 
 			LocalDate refDate = LocalDate.of(2020, 5, 1);
-
+			
+			preloadRoles();
 			// Preload the Doctors
 			preloadDoctor(1, refDate, 0, 0, 0, true, false);
 			preloadDoctor(2, refDate, 3, 5, 0, true, true);
@@ -67,7 +75,6 @@ public class LoadInitialData {
 			preloadDoctor(21, refDate.plusDays(10), 4, 5, 2, false, false);
 			
 			
-
 			// Preload allowed shifts
 			AllowedShift allowedShiftMonday = allowedShiftRepository.save(new AllowedShift("Monday"));
 			log.info("Preloading " + allowedShiftMonday);
@@ -85,6 +92,19 @@ public class LoadInitialData {
 			
 			log.info("The preload of the initial data finished");
 		};
+	}
+
+	
+
+	private void preloadRoles() {
+		 Rol doctor = new Rol("Doctor");
+	        Rol administrativo = new Rol("Administrativo");
+	        Rol administrador = new Rol("Administrador");
+	        rolRepository.save(doctor);
+	        rolRepository.save(administrador);
+	        rolRepository.save(administrativo);
+	        log.info("Roles creados");
+		
 	}
 
 	@SuppressWarnings("unused")
@@ -115,6 +135,8 @@ public class LoadInitialData {
 			int maxShifts, int numConsultations, boolean doesCycleShifts, boolean hasShiftsOnlyWhenCycleShifts,
 			Set<AllowedShift> wantedShifts, Set<AllowedShift> unwantedShifts, Set<AllowedShift> wantedConsultations) {
 		Doctor doctor = new Doctor(name, lastNames, email, startDate);
+		Optional<Rol> roles = rolRepository.findBynombreRol("Doctor");
+		doctor.addRole(roles.get());
 		doctor = doctorRepository.save(doctor);
 		log.info("Preloading: " + doctor);
 		ShiftConfiguration shiftConf = new ShiftConfiguration(minShifts, maxShifts, numConsultations, doesCycleShifts,
@@ -132,4 +154,6 @@ public class LoadInitialData {
 		preloadDoctor(number + "", number + "", number + "@guardians.com", startDate, minShifts, maxShifts,
 				numConsultations, doesCycleShifts, hasShiftsOnlyWhenCycleShifts);
 	}
+	
+	
 }
