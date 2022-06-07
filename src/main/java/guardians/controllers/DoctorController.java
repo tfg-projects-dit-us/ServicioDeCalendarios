@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.validation.ConstraintViolation;
@@ -42,9 +41,9 @@ import guardians.controllers.exceptions.TelegramIDNotFoundException;
 import guardians.model.dtos.general.DoctorPublicDTO;
 import guardians.model.entities.Absence;
 import guardians.model.entities.Doctor;
-import guardians.model.entities.ShiftConfiguration;
 import guardians.model.entities.Doctor.DoctorStatus;
 import guardians.model.entities.Rol;
+import guardians.model.entities.ShiftConfiguration;
 import guardians.model.repositories.AbsenceRepository;
 import guardians.model.repositories.DoctorRepository;
 import guardians.model.repositories.RolRepository;
@@ -218,9 +217,6 @@ public class DoctorController {
 		});
 		return doctorAssembler.toModel(new DoctorPublicDTO(doctor));
 	}
-	
-	
-	
 	
 	/**
 	 * Handle the request to update the information of a {@link Doctor}
@@ -421,7 +417,7 @@ public class DoctorController {
 	 * @author carcohcal
 	 */
 	@PutMapping("/rol/{email}")
-	public String addRol(@PathVariable("email") String email,
+	public String addRolDoctor(@PathVariable("email") String email,
 			@RequestBody String rol 	) {
 		
 		Optional<Doctor> doctor = null;
@@ -444,9 +440,14 @@ public class DoctorController {
 				return res;
 		
 	}
-	
+	/**
+	 * 
+	 * @author carcohcal
+	 * @param rol
+	 * @return
+	 */
 	@GetMapping("/rol")
-	public String listDoctorByRol(@RequestParam(required = true) String rol) {
+	public String listDoctorsByRol(@RequestParam(required = true) String rol) {
 		Optional<Rol> roleUser = rolRepository.findBynombreRol(rol);
 		List<Doctor> doctores =null;
 		if (roleUser.isPresent()) {
@@ -458,6 +459,23 @@ public class DoctorController {
 		
 	}
 	
+	@GetMapping("/rol/{email}")
+	public String getDoctorRol(@PathVariable("email") String email)
+	{
+		Optional<Doctor> doctor = null;
+		Set<Rol> roles;
+		log.info("Request received: return the doctor with id: " + email);
+		doctor = doctorRepository.findByEmail(email);
+		if (!doctor.isPresent()){
+			log.info("The doctor could not be found. Thorwing DoctorNotFoundException");
+			throw new DoctorNotFoundException(email);
+			
+		}else {
+			roles=doctor.get().getRoles();
+		}
+		
+		return roles.toString();
+	}
 	}
 	
 
