@@ -37,7 +37,7 @@ public class RolController {
 		
 	}
 	@PutMapping("/{rol}")
-	public String addTelID(@PathVariable("rol") String rol) {
+	public String addNuevoRol(@PathVariable("rol") String rol) {
 		
 		Optional<Rol> roles = null;
 				
