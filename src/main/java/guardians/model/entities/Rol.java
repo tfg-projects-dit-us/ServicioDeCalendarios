@@ -7,7 +7,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 import lombok.Data;
-
+/**
+ * 
+ * @author carcohcal
+ *
+ */
 @Data
 @Entity
 public class Rol {
@@ -44,5 +48,7 @@ public class Rol {
 	{
 		this.nombreRol=rol;
 	}
+	
+	
 	
 }

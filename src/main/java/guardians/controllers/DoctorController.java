@@ -2,6 +2,7 @@ package guardians.controllers;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -455,10 +456,16 @@ public class DoctorController {
 			if(doctores.isEmpty()) throw new NotFoundException ("Ningún doctor con ese "+ rol+" encontrado");
 		}else throw new NotFoundException ("Rol "+ rol+" no encontrado");
 		
-		return doctores.toString();
+		ArrayList<String> emails = new ArrayList<String>();
+		doctores.forEach((final Doctor persona) -> emails.add(persona.getEmail()));
+		return emails.toString();
 		
 	}
-	
+	/**
+	 * @author carcohcal
+	 * @param email
+	 * @return
+	 */
 	@GetMapping("/rol/{email}")
 	public String getDoctorRol(@PathVariable("email") String email)
 	{
@@ -475,6 +482,30 @@ public class DoctorController {
 		}
 		
 		return roles.toString();
+	}
+	/**Borrar un rol especifico de un doctor
+	 * @author carcohcal
+	 * @param email
+	 * @param rol
+	 * @return
+	 */
+	@DeleteMapping("/rol/{email}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public ResponseEntity<Doctor> deleteDoctorRol(@PathVariable String email,@RequestBody String rol) {
+		log.info("Request received: delete doctor with id " + email);
+		Optional<Doctor> doctor = doctorRepository.findByEmail(email);
+		if (!doctor.isPresent()) {
+			log.info("The doctor could not be found. Throwing DoctorNotFoundException");
+			throw new DoctorNotFoundException(email);
+		}
+		
+		if (doctor.get().getRol(rol).getClass()==Rol.class) {
+			doctor.get().getRoles().remove(doctor.get().getRol(rol));
+			doctorRepository.save(doctor.get());
+		}else throw new NotFoundException ("Doctor " +doctor.get().getEmail()+ " no contiene rol "+ rol);
+		
+		log.info("The doctor was successfully marked as deleted");
+		return ResponseEntity.noContent().build();
 	}
 	}
 	

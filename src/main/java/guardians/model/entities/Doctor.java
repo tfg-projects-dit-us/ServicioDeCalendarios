@@ -127,4 +127,14 @@ public class Doctor {
 	public String getTelegramId() {
 		return this.telegramId;
 	}
+	 public Rol getRol(String nombre) {
+		 for (Rol element :roles) 
+		 {
+			 if (element.getNombreRol().equals(nombre))
+				 return element;
+				 
+		 }
+		return null;
+		 
+	 }
 }

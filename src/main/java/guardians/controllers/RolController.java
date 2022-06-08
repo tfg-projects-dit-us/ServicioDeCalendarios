@@ -7,15 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import guardians.controllers.exceptions.AlreadyExistsException;
-import guardians.controllers.exceptions.DoctorNotFoundException;
-import guardians.controllers.exceptions.TelegramIDNotFoundException;
-import guardians.model.entities.Doctor;
 import guardians.model.entities.Rol;
 import guardians.model.repositories.RolRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +31,11 @@ public class RolController {
 		return roles.toString();	
 		
 	}
+	/**
+	 * @author carcohcal
+	 * @param rol
+	 * @return
+	 */
 	@PutMapping("/{rol}")
 	public String addNuevoRol(@PathVariable("rol") String rol) {
 		
@@ -56,4 +56,6 @@ public class RolController {
 				return res;
 		
 	}
+	
+	
 }

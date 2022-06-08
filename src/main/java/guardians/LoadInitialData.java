@@ -3,8 +3,6 @@ package guardians;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
@@ -73,7 +71,7 @@ public class LoadInitialData {
 			preloadDoctor(19, refDate.plusDays(9), 3, 5, 0, true, false);
 			preloadDoctor(20, refDate.plusDays(9), 4, 5, 2, true, false);
 			preloadDoctor(21, refDate.plusDays(10), 4, 5, 2, false, false);
-			
+			addAdminDoc ();
 			
 			// Preload allowed shifts
 			AllowedShift allowedShiftMonday = allowedShiftRepository.save(new AllowedShift("Monday"));
@@ -155,5 +153,14 @@ public class LoadInitialData {
 				numConsultations, doesCycleShifts, hasShiftsOnlyWhenCycleShifts);
 	}
 	
-	
+	private void addAdminDoc () {
+		Doctor doctor = doctorRepository.findById((long) 20).get();
+		Optional<Rol> roles = rolRepository.findBynombreRol("Administrador");
+		doctor.addRole(roles.get());
+		doctor = doctorRepository.save(doctor);
+		Doctor doctor2 = doctorRepository.findById((long) 2).get();
+		Optional<Rol> roles2= rolRepository.findBynombreRol("Administrador");
+		doctor2.addRole(roles2.get());
+		doctor2 = doctorRepository.save(doctor2);
+	}
 }
