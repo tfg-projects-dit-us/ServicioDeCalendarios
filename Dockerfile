@@ -7,5 +7,6 @@ RUN chmod 777 main.py && chmod 777 scheduler.py
 WORKDIR ../..
 EXPOSE 8080
 COPY build/libs/guardians-0.0.1.jar app.jar
+COPY src/main/resources/application.properties application.properties
 RUN chmod 777 app.jar
-ENTRYPOINT ["java","-jar","/app.jar"]
+ENTRYPOINT ["java","-jar","/app.jar","--spring.config.location=file:///application.properties"]
