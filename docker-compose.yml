@@ -12,7 +12,7 @@ services:
     ports:
       - 3306:3306
   myapp-main:
-    image: andrewem/serviciodecalendarios:prueba
+    image: andrewem/serviciodecalendarios:testing
     restart: on-failure
     depends_on:
       - myapp-mysql
