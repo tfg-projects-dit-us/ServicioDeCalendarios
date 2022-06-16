@@ -11,8 +11,6 @@ services:
       - MYSQL_PASSWORD=CatChairShowShoe
     ports:
       - 3306:3306
-    volumes:
-      - ./sql-scripts/createTable.sql:/docker-entrypoint-initdb.d/createTable.sql
   myapp-main:
     image: andrewem/serviciodecalendarios:prueba
     restart: on-failure
