@@ -12,7 +12,10 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - ./sql-scripts/createTable.sql:/docker-entrypoint-initdb.d/createTable.sql
+      - ./sql-scripts/createTables.sql:/docker-entrypoint-initdb.d/createTables.sql
+      - ./sql-scripts/populateDoctors.sql:/docker-entrypoint-initdb.d/populateDoctors.sql
+      - ./sql-scripts/populateShiftConfigs.sql:/docker-entrypoint-initdb.d/populateShiftConfigs.sql
+      - ./sql-scripts/populateAllowedShifts.sql:/docker-entrypoint-initdb.d/populateAllowedShifts.sql
   myapp-main:
     image: andrewem/serviciodecalendarios:prueba
     restart: on-failure
