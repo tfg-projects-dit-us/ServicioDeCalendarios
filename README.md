@@ -1,16 +1,10 @@
-# guardiansRESTinterface
-This repository implements the REST interface for the *Guardians Service*: A service to schedule and manage medical doctors' shifts.
+# ServicioDeCalendarios
 
-Currently, it only allows scheduling shifts.
+Este repositorio es una ampliación de un servicio REST  [*Guardians Service*:](https://github.com/tfg-projects-dit-us/guardiansRESTinterface) 
 
-## Understanding the service
-The **complete explanation for this project** can be found [here](https://idus.us.es/handle/11441/100991?locale-attribute=en).
+Este servicio permite la genración de turnos y la gestion de un servicio de calendarios. 
 
-The JavaDoc for the REST interface can be found [here](https://miggoncan.github.io/guardiansRESTinterfaceDoc).
-
-The scheduler repository can be found [here](https://github.com/miggoncan/guardiansScheduler).
-
-## Development
+## Desarrollo
 To work on this project, there are mainly four steps to be taken:
 1. Install Java 1.8
 2. Install Lombok and enable its anotation preprocessing in the desired IDE
@@ -49,5 +43,25 @@ Further instructions on the first four steps can be found [here](https://github.
        scheduler process and considering the schedule generation failed 
        (after a request to generate a schedule).
 
-## Production
-To deploy the guardians application for a production environment, visit [this repository](https://github.com/miggoncan/guardiansDeployment).
+## Producción
+1. Clona este repositorio
+2. Modifica los siguientes parámetros del archivo `resource/application.properties`   
+   1. `spring.datasource.url=jdbc:mysql://myapp-mysql:3306/db_guardians?serverTimezone=UTC`
+   2. `spring.jpa.hibernate.ddl-auto=validate`
+   3. Los siguientes parámetros con los correspondientes a tu servicio de calendario
+    ```calendario.user = USUARIO DEL CLAENDARIO
+       calendario.psw =  CONTRASEÑA DEL CALENDARIO
+        calendario.uri = URI CALDAV DEL CALENDARIO
+     ```
+3. Los siguientes parámetros con los correspondientes a tu servicio de email
+    ```
+    email.host =  HOST DEL SERVICIO DE EMAIL
+    email.loggin = USUARIO DEL EMAIL
+    email.password = CONTRASEÑA EMAIL
+    ```
+4. Ejecuta la tarea `gradle bootjar`
+5. Crea la imagen de  Docker `docker build -t yourusername/repository-name:tag . `
+6. Modifica el archivo docker-compose con el nombre de la imagen que acabas de crear
+      ``myapp-main:
+             image: yourusername/repository-name:tag `` 
+7. Ejecuta `docker-compose -f /path/docker-compose.yml up -d `
