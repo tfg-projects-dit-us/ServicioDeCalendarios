@@ -62,6 +62,10 @@ Further instructions on the first four steps can be found [here](https://github.
 4. Ejecuta la tarea `gradle bootjar`
 5. Crea la imagen de  Docker `docker build -t yourusername/repository-name:tag . `
 6. Modifica el archivo docker-compose con el nombre de la imagen que acabas de crear
-      ``myapp-main:
-             image: yourusername/repository-name:tag `` 
+
+  ```
+  myapp-main:
+     image: yourusername/repository-name:tag 
+  ```
+        
 7. Ejecuta `docker-compose -f /path/docker-compose.yml up -d `
