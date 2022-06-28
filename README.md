@@ -53,19 +53,19 @@ Further instructions on the first four steps can be found [here](https://github.
        calendario.psw =  CONTRASEÑA DEL CALENDARIO
         calendario.uri = URI CALDAV DEL CALENDARIO
      ```
-3. Los siguientes parámetros con los correspondientes a tu servicio de email
+   4. Los siguientes parámetros con los correspondientes a tu servicio de email
     ```
     email.host =  HOST DEL SERVICIO DE EMAIL
     email.loggin = USUARIO DEL EMAIL
     email.password = CONTRASEÑA EMAIL
     ```
-4. Ejecuta la tarea `gradle bootjar`
-5. Crea la imagen de  Docker `docker build -t yourusername/repository-name:tag . `
-6. Modifica el archivo docker-compose con el nombre de la imagen que acabas de crear
+3. Ejecuta la tarea `gradle bootjar`
+4. Crea la imagen de  Docker `docker build -t yourusername/repository-name:tag . `
+5. Modifica el archivo docker-compose con el nombre de la imagen que acabas de crear
 
   ```
   myapp-main:
      image: yourusername/repository-name:tag 
   ```
         
-7. Ejecuta `docker-compose -f /path/docker-compose.yml up -d `
+6. Ejecuta `docker-compose -f /path/docker-compose.yml up -d `
