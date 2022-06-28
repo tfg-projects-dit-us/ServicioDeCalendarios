@@ -45,7 +45,8 @@ Further instructions on the first four steps can be found [here](https://github.
 
 ## Producción
 1. Clona este repositorio
-2. Modifica los siguientes parámetros del archivo `resource/application.properties`   
+2. Instala [Docker](https://docs.docker.com/engine/install/ubuntu/)
+3. Modifica los siguientes parámetros del archivo `resource/application.properties`   
    1. `spring.datasource.url=jdbc:mysql://myapp-mysql:3306/db_guardians?serverTimezone=UTC`
    2. `spring.jpa.hibernate.ddl-auto=validate`
    3. Los siguientes parámetros con los correspondientes a tu servicio de calendario
