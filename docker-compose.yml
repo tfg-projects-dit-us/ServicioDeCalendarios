@@ -29,4 +29,31 @@ services:
       - DATABASE_PASSWORD=CatChairShowShoe
       - DATABASE_NAME=db_guardians
       - DATABASE_PORT=3306
+  db:
+    image: postgres
+    volumes:
+      - pgsql_data:/var/lib/postgresql/data
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: "BotGuardianes2021"
+
+  calendar:
+    image: tuxnvape/davical-standalone
+    volumes:
+      - davical_config:/config
+    restart: always
+    ports:
+      - 80:80
+    environment:
+      HOST_NAME: "guardianes"
+      PGSQL_ROOT_PASS: "BotGuardianes2021"
+      PASSDAVDB: "BotGuardianes2021"
+      DBHOST: "db"
+      ADMINDAVICALPASS: "BotGuardianes2021"
+      LANG: "en_US.UTF-8"
+      LC_ALL: "en_US.UTF-8"
+      DAVICAL_LANG: "en_US"
+volumes:
+  davical_config:
+  pgsql_data:
  
