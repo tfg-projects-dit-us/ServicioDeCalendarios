@@ -17,13 +17,15 @@ plugins {
 	id "org.springframework.boot" version "2.5.6"
 }
 
+group = 'guardians'
+version = '0.0.2'
+description = 'guardians'
+
 springBoot {
 	mainClass = 'guardians.GuardiansApplication'
 }
 
-group = 'guardians'
-version = '0.0.1'
-description = 'guardians'
+
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 
@@ -42,10 +44,8 @@ manifest {
     }
     }
 dependencies {
-	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation
-implementation 'org.springframework.boot:spring-boot-starter-validation:2.5.6'
 	
-	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-tomcat 
+	implementation 'org.springframework.boot:spring-boot-starter-validation:2.5.6'
 	implementation 'org.springframework.boot:spring-boot-starter-tomcat:2.5.6'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.5.6'
     implementation 'org.springframework.boot:spring-boot-starter-web:2.5.6'
@@ -54,12 +54,11 @@ implementation 'org.springframework.boot:spring-boot-starter-validation:2.5.6'
     implementation 'org.projectlombok:lombok:1.18.12'
     implementation 'org.mnode.ical4j:ical4j:3.1.1'
     implementation 'org.mnode.ical4j:ical4j-serializer:0.1.6'
- 	// https://mvnrepository.com/artifact/org.json/json
 	implementation 'org.json:json:20211205'
  	
     implementation group: 'com.sun.mail', name: 'javax.mail', version: '1.6.2'
     runtimeOnly 'mysql:mysql-connector-java:8.0.19'
-   /* runtimeOnly 'com.h2database:h2:1.4.200'*/
+   
     testCompileOnly 'org.projectlombok:lombok:1.18.20'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
     testImplementation 'org.springframework.boot:spring-boot-starter-test:2.5.6'
@@ -69,22 +68,22 @@ implementation 'org.springframework.boot:spring-boot-starter-validation:2.5.6'
 }
 
 publishing {
-    repositories {
-        maven {
-            name = "ServicioDeCalendarios"
-            url = uri("https://maven.pkg.github.com/tfg-projects-dit-us/ServicioDeCalendarios")
+	publications {
+		bootJava(MavenPublication) {
+			artifact bootJar
+		}
+	}
+	repositories {
+		maven {
+			url = uri("https://maven.pkg.github.com/tfg-projects-dit-us/ServicioDeCalendarios")
             credentials {
                 username =("carcohcal")
-                password = ("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")
-            }
-        }
-    }
-    publications {
-        gpr(MavenPublication) {
-            from(components.java)
-        }
-    }
+                password = ("*")}
+		}
+	}
 }
+
+
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
