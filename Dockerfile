@@ -1,4 +1,4 @@
-FROM carcohcal/enviorement:test
+FROM andrewem/serviciodecalendarios:base
 RUN git clone https://github.com/tfg-projects-dit-us/guardiansScheduler.git
 WORKDIR /guardiansScheduler
 RUN python3.7 -m pip install -r requirements.txt

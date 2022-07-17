@@ -67,17 +67,23 @@ implementation 'org.springframework.boot:spring-boot-starter-validation:2.5.6'
 	annotationProcessor 'org.projectlombok:lombok:1.18.20'
 	implementation 'com.github.caldav4j:caldav4j:1.0.1'
 }
+
 publishing {
-	publications {
-		bootJava(MavenPublication) {
-			artifact bootJar
-		}
-	}
-	repositories {
-		maven {
-			url 'https://repo.example.com'
-		}
-	}
+    repositories {
+        maven {
+            name = "ServicioDeCalendarios"
+            url = uri("https://maven.pkg.github.com/tfg-projects-dit-us/ServicioDeCalendarios")
+            credentials {
+                username =("carcohcal")
+                password = ("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")
+            }
+        }
+    }
+    publications {
+        gpr(MavenPublication) {
+            from(components.java)
+        }
+    }
 }
 
 tasks.withType(JavaCompile) {
