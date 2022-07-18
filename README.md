@@ -2,15 +2,15 @@
 
 Este repositorio es una ampliación de un servicio REST  [*Guardians Service*:](https://github.com/tfg-projects-dit-us/guardiansRESTinterface) 
 
-Este servicio permite la genración de turnos y la gestion de un servicio de calendarios. 
+Este servicio permite la generación de turnos y la gestión de un servicio de calendarios. 
 
 ## Desarrollo
 Para trabajar en este proyecto, hay principalmente cuatro pasos a seguir:
 1. Instalar Java 1.8
-2. Instale Lombok y habilite su preprocesamiento de anotación en el IDE deseado
+2. Instalar Lombok y habilitar su preprocesamiento de anotación en el IDE deseado
 3. Configurar la base de datos
 4. Configurar el IDE
-5.Configurar la integración con el scheduler
+5. Configurar la integración con el scheduler
 
 Se pueden encontrar más instrucciones sobre los primeros cuatro pasos [aquí](https://github.com/miggoncan/guardiansRESTinterfaceDoc/blob/master/setup/setup.md).
 
@@ -47,24 +47,24 @@ Se pueden encontrar más instrucciones sobre los primeros cuatro pasos [aquí](h
 
 ## Producción
 1. Instala [Docker](https://docs.docker.com/engine/install/ubuntu/)
-2. Clona este repositorio y elimina el archivo /src/main/java/guardians/LoadInitialData.java
+2. Clona este repositorio y elimina el archivo /src/main/java/guardians/LoadInitialData.java. Este fichero se utiliza en producción, para reiniciar la base de datos en cada ejecución con unos valores iniciales.
 3. Modifica los siguientes parámetros del archivo `resource/application.properties`   
-   1. Aquí se modifica localhost por el nombre del contedor de la base de datos para que Docker lo realicione `spring.datasource.url=jdbc:mysql://myapp-mysql:3306/db_guardians?serverTimezone=UTC`
-   2. Se modifica este parámetro para que la base de datos sea persistente y no se reinicie cada ejecución.  
+   1. Aquí se modifica localhost por el nombre del contenedor de la base de datos para que Docker lo relacione `spring.datasource.url=jdbc:mysql://myapp-mysql:3306/db_guardians?serverTimezone=UTC`
+   2. Se modifica este parámetro para que la base de datos sea persistente y no se reinicie en cada ejecución.  
    `spring.jpa.hibernate.ddl-auto=validate`
-   3. Los siguientes parámetros con los correspondientes a tu servicio de calendario
+   3. Los siguientes parámetros con los correspondientes al servicio de calendario que se utilice como backend para la gestión de calendarios.
     ```calendario.user = USUARIO DEL CLAENDARIO
        calendario.psw =  CONTRASEÑA DEL CALENDARIO
         calendario.uri = URI CALDAV DEL CALENDARIO
      ```
-   4. Los siguientes parámetros con los correspondientes a tu servicio de email
+   4. Los siguientes parámetros con los correspondientes al servicio de email que se utilice como backend para el envío de correos electrónicos.
     ```
     email.host =  HOST DEL SERVICIO DE EMAIL
     email.loggin = USUARIO DEL EMAIL
     email.password = CONTRASEÑA EMAIL
     ```
-3. Ejecuta la tarea `gradle bootjar`
-4. Crea la imagen de  Docker `docker build -t yourusername/repository-name:tag . `
+3. Ejecuta la tarea `gradle bootjar` para crear el .jar del servicio
+4. Crea la imagen de  Docker ejecutando el comando `docker build -t yourusername/repository-name:tag . `
 5. Modifica el archivo docker-compose con el nombre de la imagen que acabas de crear
 
   ```
@@ -73,3 +73,5 @@ Se pueden encontrar más instrucciones sobre los primeros cuatro pasos [aquí](h
   ```
         
 6. Ejecuta `docker-compose -f /path/docker-compose.yml up -d `
+
+A partir de este instante tendrá disponible en ----- el servicio de gestión de turnos y calendarios
