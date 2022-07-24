@@ -6,7 +6,10 @@ WORKDIR /guardiansScheduler/src
 RUN chmod 777 main.py && chmod 777 scheduler.py
 WORKDIR ../..
 EXPOSE 8080
-COPY build/libs/guardians-0.0.1.jar app.jar
-COPY src/main/resources/application.properties application.properties
-RUN chmod 777 app.jar
-ENTRYPOINT ["java","-jar","/app.jar","--spring.config.location=file:///application.properties"]
+COPY application.properties application.properties
+RUN curl 'https://maven.pkg.github.com/tfg-projects-dit-us/ServicioDeCalendarios/guardians.guardians/0.0.2/guardians-0.0.2.jar' \
+   -H "Authorization: token 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" \
+   -L \
+     -O
+RUN chmod 777 guardians-0.0.2.jar
+ENTRYPOINT ["java","-jar","guardians-0.0.2.jar","--spring.config.location=file:///application.properties"]
