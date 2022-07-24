@@ -8,7 +8,7 @@ WORKDIR ../..
 EXPOSE 8080
 COPY application.properties application.properties
 RUN curl 'https://maven.pkg.github.com/tfg-projects-dit-us/ServicioDeCalendarios/guardians.guardians/0.0.2/guardians-0.0.2.jar' \
-   -H "Authorization: token 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" \
+   -H "Authorization: token <Authorization token>" \
    -L \
      -O
 RUN chmod 777 guardians-0.0.2.jar
