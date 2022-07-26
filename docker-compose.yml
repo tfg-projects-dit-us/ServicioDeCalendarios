@@ -1,7 +1,5 @@
 version: '3'
-
 services:
-
   myapp-mysql:
     image: mysql:8.0
     environment:
@@ -36,7 +34,6 @@ services:
     restart: always
     environment:
       POSTGRES_PASSWORD: "BotGuardianes2021"
-
   calendar:
     image: tuxnvape/davical-standalone
     volumes:
