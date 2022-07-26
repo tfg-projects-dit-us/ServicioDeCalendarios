@@ -75,7 +75,10 @@ publishing {
 	}
 	repositories {
 		maven {
-			url 'https://repo.example.com'
+			url = uri("https://maven.pkg.github.com/tfg-projects-dit-us/ServicioDeCalendarios")
+            credentials {
+                username =("carcohcal")
+                password = ("*")}
 		}
 	}
 }
