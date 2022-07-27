@@ -1,0 +1,36 @@
+version: '3'
+services:
+  myapp-mysql:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=db_guardians
+      - MYSQL_USER=springuser
+      - MYSQL_PASSWORD=CatChairShowShoe
+    ports:
+      - 3306:3306
+    volumes:
+      - ./sql-scripts/createTables.sql:/docker-entrypoint-initdb.d/createTables.sql
+      - ./sql-scripts/populateDoctors.sql:/docker-entrypoint-initdb.d/populateDoctors.sql
+      - ./sql-scripts/populateShiftConfigs.sql:/docker-entrypoint-initdb.d/populateShiftConfigs.sql
+      - ./sql-scripts/populateAllowedShifts.sql:/docker-entrypoint-initdb.d/populateAllowedShifts.sql
+    networks:
+      - my-net
+  myapp-main:
+    image: andrewem/serviciodecalendarios:prueba
+    restart: on-failure
+    depends_on:
+      - myapp-mysql
+    ports:
+      - 8080:8080
+    environment:
+      - DATABASE_HOST=myapp-mysql
+      - DATABASE_USER=springuser
+      - DATABASE_PASSWORD=CatChairShowShoe
+      - DATABASE_NAME=db_guardians
+      - DATABASE_PORT=3306
+    networks:
+      - my-net
+networks:
+  my-net:
+    driver: bridge
