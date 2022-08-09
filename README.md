@@ -47,25 +47,34 @@ Se pueden encontrar más instrucciones sobre los primeros cuatro pasos [aquí](h
 
 ## Producción
 1. Instala [Docker](https://docs.docker.com/engine/install/ubuntu/)
-2. Clona este repositorio y elimina el archivo /src/main/java/guardians/LoadInitialData.java
+2. Clona este repositorio, los archivos están en la rama despliegue.
+3. Crea un token de autentificación de github con permisos para leer paquetes [Guía](https://docs.github.com/es/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token).
+1. En el archivo docker-compose-calendario.yml se define el servicio de calendario.
+Configurar la base de datos que persistirá los calendarios generados, creando la contraseña de administrador (POSTGRES_PASSWORD), la contraseña de la base de datos *(PGSQL_ROOT_PASS)*, configurada anteriormente *(POSTGRES_PASSWORD)*, y las contraseñas de usuario *(PASSDAVDB)* y administrador *(ADMINDAVICALPASS)* del servidor además del hostname.
+1. Iniciar el servicio con el siguiente comando: `Docker compose -f /path/docker-compose-calendario.yml up -d`
+1. Conectarse a http://localhost e iniciar sesión con la cuenta de administrador para crear al menos un usuario con permisos de escritura y lectura aparte del administrador. 
 3. Modifica los siguientes parámetros del archivo `resource/application.properties`   
-   1. Aquí se modifica localhost por el nombre del contedor de la base de datos para que Docker lo realicione `spring.datasource.url=jdbc:mysql://myapp-mysql:3306/db_guardians?serverTimezone=UTC`
-   2. Se modifica este parámetro para que la base de datos sea persistente y no se reinicie cada ejecución.  
-   `spring.jpa.hibernate.ddl-auto=validate`
-   3. Los siguientes parámetros con los correspondientes a tu servicio de calendario
-    ```calendario.user = USUARIO DEL CLAENDARIO
-       calendario.psw =  CONTRASEÑA DEL CALENDARIO
-        calendario.uri = URI CALDAV DEL CALENDARIO
-     ```
-   4. Los siguientes parámetros con los correspondientes a tu servicio de email
-    ```
-    email.host =  HOST DEL SERVICIO DE EMAIL
-    email.loggin = USUARIO DEL EMAIL
-    email.password = CONTRASEÑA EMAIL
-    ```
-3. Ejecuta la tarea `gradle bootjar`
+   1. Los siguientes parámetros con los correspondientes a tu servicio de calendario creado en el paso anterior.
+        ```calendario.user = USUARIO DEL CLAENDARIO
+           calendario.psw =  CONTRASEÑA DEL CALENDARIO
+            calendario.uri = http://calendar/caldav.php/<Usuario>/calendar/<Nombre del calendario>
+         ```
+   4. Los parámetros correspondientes al servicio de email a utilizar.
+        ```email.host =  HOST DEL SERVICIO DE EMAIL
+        email.loggin = USUARIO DEL EMAIL
+        email.password = CONTRASEÑA EMAIL
+        ```
+    1. Parámetros de la base de datos myql.
+        ```
+        spring.datasource.username= USUARIO DE LA BASE DE DATOS
+        spring.datasource.password= CONTRASEÑA DE LA BASE DE DATOS
+        ```
+
+3. En el fichero Dockerfile deberá sustituir *Authorization token* con el token generado en el paso 3.
 4. Crea la imagen de  Docker `docker build -t yourusername/repository-name:tag . `
-5. Modifica el archivo docker-compose con el nombre de la imagen que acabas de crear
+5. En el fichero docker-compose-rest.yml se definen las variables de configuración del servicio REST y la base de datos mysql. 
+
+    1. En la myapp-mysql configurar el nombre de base datos *(MYSQL_DATABASE)*, el usuario y la contraseña *(MYSQL_USER & MYSQL_PASSWORD respectivamente)*. Estos deben coincidir con los del archivo *application.properties*. Las tablas populate_sql se deberán modificar con los datos correspondientes para cada caso de uso. 
 
   ```
   myapp-main:
