@@ -14,6 +14,7 @@ services:
       - ./sql-scripts/populateDoctors.sql:/docker-entrypoint-initdb.d/populateDoctors.sql
       - ./sql-scripts/populateShiftConfigs.sql:/docker-entrypoint-initdb.d/populateShiftConfigs.sql
       - ./sql-scripts/populateAllowedShifts.sql:/docker-entrypoint-initdb.d/populateAllowedShifts.sql
+      - ./sql-scripts/populateRol.sql:/docker-entrypoint-initdb.d/populateRol.sql
     networks:
       - my-net
   myapp-main:
