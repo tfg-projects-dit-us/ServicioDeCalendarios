@@ -74,11 +74,12 @@ Configurar la base de datos que persistirá los calendarios generados, creando l
 4. Crea la imagen de  Docker `docker build -t yourusername/repository-name:tag . `
 5. En el fichero docker-compose-rest.yml se definen las variables de configuración del servicio REST y la base de datos mysql. 
 
-    1. En la myapp-mysql configurar el nombre de base datos *(MYSQL_DATABASE)*, el usuario y la contraseña *(MYSQL_USER & MYSQL_PASSWORD respectivamente)*. Estos deben coincidir con los del archivo *application.properties*. Las tablas populate_sql se deberán modificar con los datos correspondientes para cada caso de uso. 
-
-  ```
-  myapp-main:
-     image: yourusername/repository-name:tag 
-  ```
+    1. En myapp-mysql configurar el nombre de base datos *(MYSQL_DATABASE)*, el usuario y la contraseña *(MYSQL_USER & MYSQL_PASSWORD respectivamente)*. Estos deben coincidir con los del archivo *application.properties*. Las tablas populate_sql se deberán modificar con los datos correspondientes para cada caso de uso. 
+    1. myapp-main configurar los parámetros de la base de datos acorde con los modificados en el punto anterior. 
+    2. Modifica el nombre de la imagen acorde a la creada en el paso 9.
+          ```
+          myapp-main:
+             image: yourusername/repository-name:tag 
+          ```
         
-6. Ejecuta `docker-compose -f /path/docker-compose.yml up -d `
+6. Ejecuta `docker-compose -f /path/docker-compose-rest.yml up -d `
