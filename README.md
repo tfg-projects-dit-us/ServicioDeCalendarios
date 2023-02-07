@@ -2,7 +2,7 @@
 
 Este repositorio es una ampliación de un servicio REST  [*Guardians Service*:](https://github.com/tfg-projects-dit-us/guardiansRESTinterface) 
 
-Este servicio permite la genración de turnos y la gestion de un servicio de calendarios. 
+Este servicio permite la generación de turnos y la gestión de un servicio de calendarios. 
 
 ## Desarrollo
 Para trabajar en este proyecto, hay principalmente cuatro pasos a seguir:
