@@ -54,7 +54,7 @@ public class RootController {
 	@GetMapping("/")
 	public CollectionModel<Object> getRootLinks() {
 		log.info("Request received: get root");
-		return new CollectionModel<Object>(Collections.emptyList(),
+		return CollectionModel.of(Collections.emptyList(),
 				linkTo(methodOn(RootController.class).getRootLinks()).withSelfRel(),
 				linkTo(methodOn(DoctorController.class).getDoctors(null)).withRel(doctorsLink),
 				linkTo(methodOn(DoctorController.class).getDoctor(null)).withRel(doctorLink),
@@ -66,6 +66,7 @@ public class RootController {
 				linkTo(methodOn(ScheduleController.class).getSchedules()).withRel(schedulesLink),
 				linkTo(methodOn(ScheduleController.class).getScheduleRequest(null)).withRel(scheduleLink),
 				linkTo(methodOn((AllowedShiftsController.class)).getAllowedShifts()).withRel(allowedShiftsLink));
+				
 	}
 
 }

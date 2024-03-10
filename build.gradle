@@ -7,14 +7,14 @@ buildscript {
      
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.5.6")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:3.2.3")
     }}
 plugins {
     id 'java'
     id 'maven-publish'
 	id 'application'
 	id 'eclipse'
-	id "org.springframework.boot" version "2.5.6"
+	id "org.springframework.boot" version "3.2.3"
 }
 
 springBoot {
@@ -24,7 +24,7 @@ springBoot {
 group = 'guardians'
 version = '0.0.1'
 description = 'guardians'
-java.sourceCompatibility = JavaVersion.VERSION_1_8
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 
 repositories {
@@ -43,14 +43,14 @@ manifest {
     }
 dependencies {
 	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation
-implementation 'org.springframework.boot:spring-boot-starter-validation:2.5.6'
+implementation 'org.springframework.boot:spring-boot-starter-validation:3.2.3'
 	
 	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-tomcat 
-	implementation 'org.springframework.boot:spring-boot-starter-tomcat:2.5.6'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.5.6'
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.5.6'
-    implementation 'org.springframework.boot:spring-boot-starter-hateoas:2.5.6'
-    implementation 'org.springframework.boot:spring-boot-starter-security:2.5.6'
+	implementation 'org.springframework.boot:spring-boot-starter-tomcat:3.2.3'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.2.3'
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.2.3'
+    implementation 'org.springframework.boot:spring-boot-starter-hateoas:3.2.3'
+    implementation 'org.springframework.boot:spring-boot-starter-security:3.2.3'
     implementation 'org.projectlombok:lombok:1.18.12'
     implementation 'org.mnode.ical4j:ical4j:3.1.1'
     implementation 'org.mnode.ical4j:ical4j-serializer:0.1.6'
@@ -58,11 +58,13 @@ implementation 'org.springframework.boot:spring-boot-starter-validation:2.5.6'
 	implementation 'org.json:json:20211205'
  	
     implementation group: 'com.sun.mail', name: 'javax.mail', version: '1.6.2'
-    runtimeOnly 'mysql:mysql-connector-java:8.0.19'
+   // runtimeOnly 'mysql:mysql-connector-java:8.0.19'
+   	runtimeOnly 'org.postgresql:postgresql:42.7.2'
+   
    /* runtimeOnly 'com.h2database:h2:1.4.200'*/
     testCompileOnly 'org.projectlombok:lombok:1.18.20'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.5.6'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.2.3'
     compileOnly 'org.projectlombok:lombok:1.18.20'
 	annotationProcessor 'org.projectlombok:lombok:1.18.20'
 	implementation 'com.github.caldav4j:caldav4j:1.0.1'

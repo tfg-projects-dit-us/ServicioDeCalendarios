@@ -2,7 +2,8 @@ package guardians.controllers.exceptions;
 
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
+//import javax.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolation;
 
 import guardians.model.entities.ShiftConfiguration;
 

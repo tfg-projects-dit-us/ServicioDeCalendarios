@@ -2,7 +2,7 @@ package guardians.model.entities.primarykeys;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 import guardians.model.entities.Calendar;
 import lombok.Data;

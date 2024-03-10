@@ -44,12 +44,13 @@ public class ShiftConfigurationAssembler
 	@SuppressWarnings("deprecation")
 	@Override
 	public EntityModel<ShiftConfigurationPublicDTO> toModel(ShiftConfigurationPublicDTO entity) {
-		return new EntityModel<ShiftConfigurationPublicDTO>(entity,
+		return EntityModel.of(entity,
 				linkTo(methodOn(ShiftConfigurationController.class).getShitfConfiguration(entity.getDoctorId()))
 						.withSelfRel(),
 				linkTo(methodOn(ShiftConfigurationController.class).getShitfConfigurations()).withRel(shiftConfsLink),
 				linkTo(methodOn(DoctorController.class).getDoctor(entity.getDoctorId())).withRel(doctorLink),
 				linkTo(methodOn(AllowedShiftsController.class).getAllowedShifts()).withRel(allowedShiftsLink));
+				
 	}
 
 	@SuppressWarnings("deprecation")
@@ -60,8 +61,9 @@ public class ShiftConfigurationAssembler
 		for (ShiftConfigurationPublicDTO entity : entities) {
 			shiftConfs.add(this.toModel(entity));
 		}
-		return new CollectionModel<>(shiftConfs,
+		return CollectionModel.of(shiftConfs,
 				linkTo(methodOn(ShiftConfigurationController.class).getShitfConfigurations()).withSelfRel(),
 				linkTo(methodOn(RootController.class).getRootLinks()).withRel(rootLink));
+				
 	}
 }

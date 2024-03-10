@@ -1,6 +1,6 @@
 package guardians.controllers.exceptions;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 /**
  * All exceptions that represent an {@link Entity} is not valid will extend this

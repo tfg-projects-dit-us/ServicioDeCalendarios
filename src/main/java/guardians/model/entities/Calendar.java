@@ -2,11 +2,11 @@ package guardians.model.entities;
 
 import java.util.SortedSet;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.OneToMany;
 
 import org.hibernate.annotations.SortNatural;
 import org.hibernate.validator.constraints.Range;

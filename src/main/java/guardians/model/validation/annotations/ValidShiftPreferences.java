@@ -8,9 +8,9 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import javax.validation.Constraint;
-import javax.validation.ConstraintValidator;
-import javax.validation.Payload;
+import jakarta.validation.Constraint;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.Payload;
 
 import guardians.model.validation.validators.ShiftPreferencesDayConfigValidator;
 import guardians.model.validation.validators.ShiftPreferencesShiftConfigValidator;

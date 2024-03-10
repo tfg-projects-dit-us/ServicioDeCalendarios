@@ -43,13 +43,15 @@ public class CalendarAssembler
 	@Override
 	public EntityModel<CalendarPublicDTO> toModel(CalendarPublicDTO entity) {
 		YearMonth yearMonth = YearMonth.of(entity.getYear(), entity.getMonth());
-		return new EntityModel<CalendarPublicDTO>(entity, this.getLinks(yearMonth));
+		return EntityModel.of(entity, this.getLinks(yearMonth));
+		
 	}
 	
 	@SuppressWarnings("deprecation")
 	public EntityModel<CalendarSummaryPublicDTO> toModel(CalendarSummaryPublicDTO entity) {
 		YearMonth yearMonth = YearMonth.of(entity.getYear(), entity.getMonth());
-		return new EntityModel<CalendarSummaryPublicDTO>(entity,this.getLinks(yearMonth));
+		return EntityModel.of(entity,this.getLinks(yearMonth));
+	
 	}
 
 	private List<Link> getLinks(YearMonth yearMonth) {
@@ -68,8 +70,9 @@ public class CalendarAssembler
 		for (CalendarPublicDTO entity : entities) {
 			calendars.add(this.toModel(entity));
 		}
-		return new CollectionModel<>(calendars, linkTo(methodOn(CalendarController.class).getCalendars()).withSelfRel(),
+		return CollectionModel.of(calendars, linkTo(methodOn(CalendarController.class).getCalendars()).withSelfRel(),
 				linkTo(methodOn(RootController.class).getRootLinks()).withRel(rootLink));
+		
 	}
 
 	@SuppressWarnings("deprecation")
@@ -79,7 +82,8 @@ public class CalendarAssembler
 		for (CalendarSummaryPublicDTO entity : entities) {
 			calendars.add(this.toModel(entity));
 		}
-		return new CollectionModel<>(calendars, linkTo(methodOn(CalendarController.class).getCalendars()).withSelfRel(),
+		return CollectionModel.of(calendars, linkTo(methodOn(CalendarController.class).getCalendars()).withSelfRel(),
 				linkTo(methodOn(RootController.class).getRootLinks()).withRel(rootLink));
+		
 	}
 }

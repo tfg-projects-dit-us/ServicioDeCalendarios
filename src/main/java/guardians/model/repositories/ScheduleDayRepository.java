@@ -1,6 +1,6 @@
 package guardians.model.repositories;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

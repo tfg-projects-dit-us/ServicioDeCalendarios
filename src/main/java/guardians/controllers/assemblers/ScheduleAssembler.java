@@ -54,8 +54,9 @@ public class ScheduleAssembler
 			throw new InvalidEntityException("Trying to map to an EntityModel an invalid Schedule. "
 					+ "Its month and year are: " + schedule.getMonth() + "/" + schedule.getYear());
 		}
-		EntityModel<SchedulePublicDTO> entity = new EntityModel<>(schedule, 
+		EntityModel<SchedulePublicDTO> entity = EntityModel.of(schedule, 
 				this.getLinks(yearMonth, schedule.getStatus()));
+				
 		log.info("The model created is: " + entity);
 		return entity;
 	}
@@ -64,8 +65,9 @@ public class ScheduleAssembler
 		log.info("Request to map to model the ScheduleSummaryPublicDTO: " + schedule);
 		YearMonth yearMonth =  YearMonth.of(schedule.getYear(), schedule.getMonth());
 		@SuppressWarnings("deprecation")
-		EntityModel<ScheduleSummaryPublicDTO> entity = new EntityModel<>(schedule, 
-				this.getLinks(yearMonth, schedule.getStatus()));
+		EntityModel<ScheduleSummaryPublicDTO> entity = EntityModel.of(schedule, 
+				this.getLinks(yearMonth, schedule.getStatus())); 
+		
 		log.info("The model created is: " + entity);
 		return entity;
 	}
@@ -96,9 +98,10 @@ public class ScheduleAssembler
 		for (ScheduleSummaryPublicDTO entity : entities) {
 			schedules.add(this.toModel(entity));
 		}
-		return new CollectionModel<>(schedules, 
+		return CollectionModel.of(schedules, 
 				linkTo(methodOn(ScheduleController.class).getSchedules()).withSelfRel(),
 				linkTo(methodOn(RootController.class).getRootLinks()).withRel(rootLink));
+				
 	}
 
 }

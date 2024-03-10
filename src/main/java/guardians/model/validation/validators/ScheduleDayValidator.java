@@ -2,8 +2,8 @@ package guardians.model.validation.validators;
 
 import java.util.Set;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 import guardians.model.entities.Doctor;
 import guardians.model.entities.ScheduleDay;

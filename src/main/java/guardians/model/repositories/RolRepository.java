@@ -2,7 +2,7 @@ package guardians.model.repositories;
 
 import java.util.Optional;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

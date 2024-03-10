@@ -1,7 +1,7 @@
 package guardians.model.validation.validators;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 import guardians.model.entities.CycleChange;
 import guardians.model.validation.annotations.ValidDayMonthYear;

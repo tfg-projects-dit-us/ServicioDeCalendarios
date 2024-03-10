@@ -45,12 +45,13 @@ public class DoctorAssembler implements RepresentationModelAssembler<DoctorPubli
 	@Override
 	public EntityModel<DoctorPublicDTO> toModel(DoctorPublicDTO entity) {
 		@SuppressWarnings("deprecation")
-		EntityModel<DoctorPublicDTO> doctorEntity = new EntityModel<>(entity,
+		EntityModel<DoctorPublicDTO> doctorEntity = EntityModel.of(entity,
 				linkTo(methodOn(DoctorController.class).getDoctor(entity.getId())).withSelfRel(),
 				// TODO add a link to delete the doctor
 				linkTo(methodOn(DoctorController.class).getDoctors(null)).withRel(doctorsLink),
 				linkTo(methodOn(ShiftConfigurationController.class).getShitfConfiguration(entity.getId()))
 						.withRel(shiftConfLink));
+	
 		if (entity.getStatus() != DoctorStatus.DELETED) {
 			doctorEntity.add(
 					linkTo(methodOn(DoctorController.class).getDoctor(entity.getId())).withRel(updateDoctorLink));
@@ -66,9 +67,10 @@ public class DoctorAssembler implements RepresentationModelAssembler<DoctorPubli
 		for (DoctorPublicDTO entity : entities) {
 			doctors.add(this.toModel(entity));
 		}
-		return new CollectionModel<>(doctors, 
+		return CollectionModel.of(doctors, 
 				linkTo(methodOn(DoctorController.class).getDoctors(null)).withSelfRel(),
 				linkTo(methodOn(DoctorController.class).newDoctor(null, null)).withRel(newDoctorLink),
 				linkTo(methodOn(RootController.class).getRootLinks()).withRel(rootLink));
+				
 	}
 }

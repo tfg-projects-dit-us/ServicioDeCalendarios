@@ -35,9 +35,9 @@ public class AllowedShiftAssembler
 	@SuppressWarnings("deprecation")
 	@Override
 	public EntityModel<AllowedShiftPublicDTO> toModel(AllowedShiftPublicDTO entity) {
-		return new EntityModel<AllowedShiftPublicDTO>(entity,
+		return EntityModel.of(entity,
 				linkTo(methodOn(AllowedShiftsController.class).getAllowedShift(entity.getId())).withSelfRel(),
-				linkTo(methodOn(AllowedShiftsController.class).getAllowedShifts()).withRel(allowedShiftsLink));
+				linkTo(methodOn(AllowedShiftsController.class).getAllowedShifts()).withRel(allowedShiftsLink));			
 	}
 
 	@SuppressWarnings("deprecation")
@@ -48,9 +48,10 @@ public class AllowedShiftAssembler
 		for (AllowedShiftPublicDTO entity : entities) {
 			allowedShifts.add(this.toModel(entity));
 		}
-		return new CollectionModel<>(allowedShifts,
+		return CollectionModel.of(allowedShifts,
 				linkTo(methodOn(AllowedShiftsController.class).getAllowedShifts()).withSelfRel(),
 				linkTo(methodOn(ShiftConfigurationController.class).getShitfConfigurations()).withRel(shiftConfsLink));
+				
 	}
 
 }
