@@ -6,7 +6,7 @@ Este servicio permite la generación de turnos y la gestión de un servicio de c
 
 ## Desarrollo
 Para trabajar en este proyecto, hay principalmente cuatro pasos a seguir:
-1. Instalar Java 1.8
+1. Instalar Java 17
 2. Instale Lombok y habilite su preprocesamiento de anotación en el IDE deseado
 3. Configurar la base de datos
 4. Configurar el IDE
